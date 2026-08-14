@@ -7450,7 +7450,8 @@ const HO = {
   BANNER_TTL: 16 * 60 * 60 * 1000, // 16 hours
 
   openHandoff() {
-    // Switch to tracking tab and enter handoff mode
+    // Toggle handoff mode
+    if (this._hoMode) { this.exitHandoffMode(); return; }
     if (!SHEET_TRACKING.length) {
       loadTrackingFromSheet().then(() => this.openHandoff());
       return;
@@ -7460,8 +7461,12 @@ const HO = {
     this._selectedCases = {};
     document.getElementById('tracking-list').classList.add('ho-mode');
     document.getElementById('ho-mode-banner').style.display = 'block';
+    document.getElementById('handoff-btn').classList.add('on');
     renderTracking();
     this._updateFloatingBar();
+    // ESC to exit
+    this._escHandler = (e) => { if (e.key === 'Escape') this.exitHandoffMode(); };
+    document.addEventListener('keydown', this._escHandler);
   },
 
   exitHandoffMode() {
@@ -7470,6 +7475,8 @@ const HO = {
     document.getElementById('tracking-list').classList.remove('ho-mode');
     document.getElementById('ho-mode-banner').style.display = 'none';
     document.getElementById('ho-floating-bar').classList.remove('visible');
+    document.getElementById('handoff-btn').classList.remove('on');
+    if (this._escHandler) { document.removeEventListener('keydown', this._escHandler); this._escHandler = null; }
     renderTracking();
   },
 
@@ -7533,6 +7540,9 @@ const HO = {
     this.exitHandoffMode();
     showToast('📝 引継ぎメモを保存しました！');
     document.getElementById('handoff-pending-dot').style.display = 'none';
+    // Flash handoff cases in tracking list
+    this._handoffCaseIds = new Set(notes.filter(n => n.note).map(n => n.case_id));
+    renderTracking();
     await fetch(API_URL + '?action=saveHandoff&staff=' + encodeURIComponent(handoff.staff) + '&saved_at=' + encodeURIComponent(handoff.saved_at) + '&notes=' + encodeURIComponent(JSON.stringify(handoff.notes)));
   },
 
@@ -7582,26 +7592,56 @@ const HO = {
       const res = await fetch(API_URL + '?action=getHandoffList');
       const list = await res.json();
       if (!list.length) { el.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text3)">履歴なし</div>`; return; }
+      // Build set of resolved case IDs from SHEET_TRACKING
+      const resolvedIds = new Set((SHEET_TRACKING||[]).filter(t=>t.status==='完了'||t.status==='対応不要').map(t=>`tracking-${t.row}`));
       el.innerHTML = list.map(h => {
         const t = new Date(h.saved_at);
         const dateStr = `${t.getMonth()+1}/${t.getDate()} ${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}`;
         const readBy = (h.read_by || []).join(', ');
         const notes = (h.notes || []).filter(n => n.note);
         return `<div style="border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px;background:var(--bg3)">
-          <div style="display:flex;justify-content:space-between;margin-bottom:8px">
-            <span style="font-weight:600;color:var(--accent)">${h.staff}</span>
-            <span style="font-size:11px;color:var(--text3)">${dateStr}</span>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <span style="font-weight:600;color:var(--accent)">${h.staff} <span style="font-size:11px;color:var(--text3);font-weight:400">${dateStr}</span></span>
+            <button onclick="HO.deleteHandoff('${h.id}')" style="font-size:11px;padding:2px 8px;border-radius:6px;border:1px solid var(--danger);color:var(--danger);background:transparent;cursor:pointer">🗑 削除</button>
           </div>
-          ${notes.length ? notes.map(n => `
-            <div style="font-size:12px;padding:6px 10px;background:var(--bg2);border-radius:6px;margin-bottom:4px">
-              <span style="color:var(--text2);font-weight:600">${n.customer_name || n.case_id}</span>
-              <span style="color:var(--text3);margin:0 4px">[${n.channel || '—'}]</span>
-              <span style="color:var(--text)">${n.note}</span>
-            </div>`).join('') : `<div style="font-size:12px;color:var(--text3);font-style:italic">メモなし</div>`}
+          ${notes.length ? notes.map(n => {
+            const isDone = resolvedIds.has(n.case_id);
+            return `<div style="font-size:12px;padding:6px 10px;background:var(--bg2);border-radius:6px;margin-bottom:4px;${isDone?'opacity:.5':''}">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+                ${isDone ? '<span style="color:var(--success);font-size:10px">✅ 完了</span>' : '<span style="color:var(--warning);font-size:10px">🔄 対応中</span>'}
+                <span style="color:var(--text2);font-weight:600">${n.customer_name || n.case_id}</span>
+                <span style="color:var(--text3)">[${n.channel || '—'}]</span>
+              </div>
+              <div style="color:var(--text)">${n.note}</div>
+              ${!isDone ? `<button onclick="HO.carryOver('${n.case_id}','${(n.customer_name||'').replace(/'/g,'')}','${n.channel||''}')" style="margin-top:4px;font-size:10px;padding:1px 8px;border-radius:4px;border:1px solid rgba(46,204,113,.4);color:#2ecc71;background:transparent;cursor:pointer">➕ 引継ぎに追加</button>` : ''}
+            </div>`;
+          }).join('') : `<div style="font-size:12px;color:var(--text3);font-style:italic">メモなし</div>`}
           ${readBy ? `<div style="font-size:11px;color:rgba(46,204,113,.6);margin-top:6px">✅ 確認済: ${readBy}</div>` : ''}
         </div>`;
       }).join('');
     } catch(e) { el.innerHTML = `<div style="text-align:center;padding:20px;color:var(--danger)">読み込みエラー</div>`; }
+  },
+
+  async deleteHandoff(id) {
+    if (!confirm('この引継ぎを削除しますか？')) return;
+    await fetch(API_URL + '?action=deleteHandoff&id=' + encodeURIComponent(id));
+    this.loadHistory();
+    showToast('🗑 削除しました');
+  },
+
+  carryOver(caseId, label, channel) {
+    // Pre-select this case and enter handoff mode
+    document.getElementById('handoff-modal').classList.remove('open');
+    this.openHandoff();
+    setTimeout(() => {
+      // Find and pre-select the card
+      const cards = document.querySelectorAll('.track-card');
+      cards.forEach(card => {
+        if (card.getAttribute('onclick') && card.getAttribute('onclick').includes(caseId)) {
+          card.click();
+        }
+      });
+    }, 300);
   },
 
   _showBanner(handoff) {
