@@ -7751,16 +7751,19 @@ const HO = {
     const note = n ? n.note : '';
     // Show note modal if note exists
     if (note) {
+      document.getElementById('_ho_note_overlay')?.remove();
       const m = document.createElement('div');
+      m.id = '_ho_note_overlay';
       m.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9999;display:flex;align-items:center;justify-content:center';
+      const closeNote = () => document.getElementById('_ho_note_overlay')?.remove();
       m.innerHTML = `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:24px;max-width:480px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.5)">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
           <div style="font-weight:700;color:var(--accent);font-size:15px">🔖 ${customerName || ''} の引継ぎメモ</div>
-          <button onclick="this.closest('[style*=fixed]').remove()" style="background:none;border:none;color:var(--text3);font-size:22px;cursor:pointer;line-height:1">×</button>
+          <button onclick="document.getElementById('_ho_note_overlay').remove()" style="background:none;border:none;color:var(--text3);font-size:22px;cursor:pointer;line-height:1">×</button>
         </div>
         <div style="font-size:14px;color:var(--text);white-space:pre-wrap;line-height:1.7">${note.replace(/\\n/g,'\n')}</div>
         <div style="margin-top:18px;text-align:right">
-          <button onclick="this.closest('[style*=fixed]').remove();HO.closeBanner();setTimeout(()=>{const cards=document.querySelectorAll('.track-card');for(const c of cards){if((c.getAttribute('onclick')||'').includes('${caseId}')){const h=c.querySelector('[data-subject]');if(h)h.click();break;}}},100)" style="font-size:12px;padding:6px 18px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer;font-weight:600">💬 対応履歴を見る</button>
+          <button onclick="document.getElementById('_ho_note_overlay').remove();HO.closeBanner();setTimeout(()=>{const cards=document.querySelectorAll('.track-card');for(const c of cards){if((c.getAttribute('onclick')||'').includes('${caseId}')){const h=c.querySelector('[data-subject]');if(h)h.click();break;}}},100)" style="font-size:12px;padding:6px 18px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer;font-weight:600">💬 対応履歴を見る</button>
         </div>
       </div>`;
       m.addEventListener('click', e => { if (e.target === m) m.remove(); });
