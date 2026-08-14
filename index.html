@@ -1464,7 +1464,10 @@ select option{background:var(--bg3)}
         </div>
       </div>
       <div id="handoff-tab-history" style="display:none">
-        <div id="handoff-history-list" style="max-height:400px;overflow-y:auto"></div>
+        <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+          <button onclick="HO.deleteAllHandoff()" style="font-size:11px;padding:3px 10px;border-radius:6px;border:1px solid var(--danger);color:var(--danger);background:transparent;cursor:pointer">🗑 全て削除</button>
+        </div>
+        <div id="handoff-history-list" style="max-height:380px;overflow-y:auto"></div>
       </div>
     </div>
   </div>
@@ -7631,12 +7634,23 @@ const HO = {
     const el = document.querySelector(`[data-handoff-id="${id}"]`);
     if (el) el.remove();
     showToast('🗑 削除しました');
-    if (!id) { showToast('⚠️ この記録はIDがないため削除できません'); return; }
     try {
       const res = await fetch(API_URL + '?action=deleteHandoff&id=' + encodeURIComponent(id));
       const json = await res.json();
-      if (!json.ok) showToast('⚠️ サーバー側の削除に失敗しました');
+      if (!json.ok) showToast('⚠️ サーバー側の削除に失敗 (古い記録はIDなし)');
       else this.loadHistory();
+    } catch(e) { showToast('⚠️ 通信エラー'); }
+  },
+
+  async deleteAllHandoff() {
+    if (!confirm('引継ぎ履歴を全て削除しますか？')) return;
+    document.getElementById('handoff-history-list').innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3)">削除中...</div>';
+    showToast('🗑 全て削除しました');
+    this._handoffCaseIds = new Set();
+    renderTracking && renderTracking();
+    try {
+      await fetch(API_URL + '?action=deleteAllHandoff');
+      this.loadHistory();
     } catch(e) { showToast('⚠️ 通信エラー'); }
   },
 
