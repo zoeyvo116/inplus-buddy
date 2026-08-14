@@ -7570,9 +7570,15 @@ const HO = {
       if (!handoff || !handoff.saved_at) return;
       const age = Date.now() - new Date(handoff.saved_at).getTime();
       if (age > this.BANNER_TTL) return;
-      // Always set handoff case IDs for flashing, regardless of banner
+      // Build _handoffCaseIds from ALL recent handoffs, not just the latest
       this._currentHandoff = handoff;
-      this._handoffCaseIds = new Set((handoff.notes||[]).filter(n=>n.note).map(n=>n.case_id));
+      try {
+        const listRes = await fetch(API_URL + '?action=getHandoffList');
+        const list = await listRes.json();
+        this._handoffCaseIds = new Set(list.flatMap(h => (h.notes||[]).filter(n=>n.note).map(n=>n.case_id)));
+      } catch(e) {
+        this._handoffCaseIds = new Set((handoff.notes||[]).filter(n=>n.note).map(n=>n.case_id));
+      }
       renderTracking && renderTracking();
       const myStaff = CM.staff ? CM.staff() : '';
       if (handoff.staff === myStaff && age < 60000) return;
