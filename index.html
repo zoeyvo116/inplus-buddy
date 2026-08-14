@@ -5307,6 +5307,7 @@ async function loadTrackingFromSheet(){
 }
 
 function _updateStaleAlert() {
+  return; // stale alert removed
   const now = Date.now();
   const THREE_DAYS = 3 * 86400000;
   const activeStatuses = new Set(['未対応', '対応中', '返信待ち', '保留中']);
