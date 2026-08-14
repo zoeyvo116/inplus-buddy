@@ -7561,11 +7561,7 @@ const HO = {
       this._currentHandoff = handoff;
       this._handoffCaseIds = new Set((handoff.notes||[]).filter(n=>n.note).map(n=>n.case_id));
       renderTracking && renderTracking();
-      const myStaff = CM.staff ? CM.staff() : '';
-      if (handoff.staff === myStaff && age < 60000) return;
-      const readBy = handoff.read_by || [];
-      if (myStaff && readBy.includes(myStaff)) return;
-      this._showBanner(handoff);
+      // Banner auto-popup removed — cards show handoff badge instead
     } catch(e) {}
   },
 
@@ -7632,11 +7628,16 @@ const HO = {
 
   async deleteHandoff(id) {
     if (!confirm('この引継ぎを削除しますか？')) return;
-    // Remove from DOM immediately
     const el = document.querySelector(`[data-handoff-id="${id}"]`);
     if (el) el.remove();
     showToast('🗑 削除しました');
-    fetch(API_URL + '?action=deleteHandoff&id=' + encodeURIComponent(id));
+    if (!id) { showToast('⚠️ この記録はIDがないため削除できません'); return; }
+    try {
+      const res = await fetch(API_URL + '?action=deleteHandoff&id=' + encodeURIComponent(id));
+      const json = await res.json();
+      if (!json.ok) showToast('⚠️ サーバー側の削除に失敗しました');
+      else this.loadHistory();
+    } catch(e) { showToast('⚠️ 通信エラー'); }
   },
 
   carryOver(caseId, label, channel) {
@@ -7699,7 +7700,6 @@ const HO = {
     this.closeBanner();
     goPage('tracking', document.querySelector('.nav-item[onclick*="tracking"]'));
     setTimeout(() => {
-      // Scroll to and highlight the card
       const cards = document.querySelectorAll('.track-card');
       for (const card of cards) {
         const onclick = card.getAttribute('onclick') || '';
@@ -7708,6 +7708,9 @@ const HO = {
           card.style.transition = 'outline .1s';
           card.style.outline = '3px solid var(--accent)';
           setTimeout(() => card.style.outline = '', 2000);
+          // Auto-open the 履歴 modal for this card
+          const histBtn = card.querySelector('[data-subject]');
+          if (histBtn) setTimeout(() => histBtn.click(), 300);
           break;
         }
       }
