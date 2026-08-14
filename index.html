@@ -5632,6 +5632,15 @@ function renderTracking(){
       </div>
     </div>`;
   }).join('');
+
+  // Re-apply ho-selected after render
+  if (HO._hoMode && HO._selectedCases) {
+    document.querySelectorAll('.track-card').forEach(card => {
+      const onclick = card.getAttribute('onclick') || '';
+      const match = onclick.match(/toggleCard\(this,'([^']+)'/);
+      if (match && HO._selectedCases[match[1]]) card.classList.add('ho-selected');
+    });
+  }
 }
 
 async function deleteSheetRow(row, btn){
