@@ -7732,7 +7732,7 @@ const HO = {
         </div>
         <div style="font-size:14px;color:var(--text);white-space:pre-wrap;line-height:1.7">${note.replace(/\\n/g,'\n')}</div>
         <div style="margin-top:18px;text-align:right">
-          <button onclick="this.closest('[style*=fixed]').remove()" style="font-size:12px;padding:6px 18px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer">閉じる</button>
+          <button onclick="this.closest('[style*=fixed]').remove();setTimeout(()=>{const cards=document.querySelectorAll('.track-card');for(const c of cards){if((c.getAttribute('onclick')||'').includes('${caseId}')){const h=c.querySelector('[data-subject]');if(h)h.click();break;}}},100)" style="font-size:12px;padding:6px 18px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer;font-weight:600">💬 対応履歴を見る</button>
         </div>
       </div>`;
       m.addEventListener('click', e => { if (e.target === m) m.remove(); });
