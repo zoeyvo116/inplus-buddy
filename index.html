@@ -385,9 +385,12 @@ select option{background:var(--bg3)}
     <span style="font-size:10px;color:var(--text3)">変更</span>
   </div>
   <!-- #8 Shift Handoff button -->
-  <div id="handoff-btn" class="nav-item" onclick="HO.openHandoff()">
-    <span class="nav-icon">📝</span>引継ぎメモ
-    <span id="handoff-pending-dot" style="display:none;width:7px;height:7px;border-radius:50%;background:var(--warning);margin-left:auto"></span>
+  <div id="handoff-btn" class="nav-item" onclick="HO.openHandoff()" style="justify-content:space-between">
+    <span style="display:flex;align-items:center;gap:8px"><span class="nav-icon">📝</span>引継ぎメモ</span>
+    <span style="display:flex;align-items:center;gap:6px">
+      <span id="handoff-pending-dot" style="display:none;width:7px;height:7px;border-radius:50%;background:var(--warning)"></span>
+      <span onclick="event.stopPropagation();HO.openHistory()" style="font-size:10px;padding:1px 6px;border-radius:4px;border:1px solid var(--border);color:var(--text3);cursor:pointer" title="引継ぎ履歴">履歴</span>
+    </span>
   </div>
   <div class="theme-toggle" onclick="toggleTheme()">
     <span id="theme-label">🌙 ダークモード</span>
@@ -7469,6 +7472,12 @@ const HO = {
     document.addEventListener('keydown', this._escHandler);
   },
 
+  openHistory() {
+    if (this._hoMode) this.exitHandoffMode();
+    document.getElementById('handoff-modal').classList.add('open');
+    this.switchTab('history');
+  },
+
   exitHandoffMode() {
     this._hoMode = false;
     this._selectedCases = {};
@@ -7553,6 +7562,10 @@ const HO = {
       if (!handoff || !handoff.saved_at) return;
       const age = Date.now() - new Date(handoff.saved_at).getTime();
       if (age > this.BANNER_TTL) return;
+      // Always set handoff case IDs for flashing, regardless of banner
+      this._currentHandoff = handoff;
+      this._handoffCaseIds = new Set((handoff.notes||[]).filter(n=>n.note).map(n=>n.case_id));
+      renderTracking && renderTracking();
       const myStaff = CM.staff ? CM.staff() : '';
       if (handoff.staff === myStaff && age < 60000) return;
       const readBy = handoff.read_by || [];
