@@ -242,6 +242,16 @@ select option{background:var(--bg3)}
 .handoff-badge{background:#27ae60;color:#fff;font-size:9px;padding:1px 6px;border-radius:3px;font-weight:700;letter-spacing:.05em;vertical-align:middle;margin-left:5px;animation:pulse 1.4s infinite}
 .handoff-card{outline:2px solid rgba(39,174,96,.5);outline-offset:-2px;animation:pulse-border 1.4s infinite}
 @keyframes pulse-border{0%,100%{outline-color:rgba(39,174,96,.5)}50%{outline-color:rgba(39,174,96,.15)}}
+/* Handoff mode */
+.ho-mode .track-card{cursor:pointer;transition:outline .15s}
+.ho-mode .track-card:hover{outline:2px solid var(--accent);outline-offset:-2px}
+.ho-mode .track-card.ho-selected{outline:2px solid #27ae60;background:rgba(39,174,96,.07)!important}
+.ho-checkbox{width:18px;height:18px;border-radius:5px;border:2px solid var(--border);background:var(--bg2);display:none;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;margin-right:2px}
+.ho-mode .ho-checkbox{display:flex}
+.ho-selected .ho-checkbox{background:#27ae60;border-color:#27ae60;color:#fff}
+#ho-floating-bar{position:fixed;bottom:70px;left:50%;transform:translateX(-50%) translateY(20px);z-index:4000;background:var(--bg2);border:1px solid #27ae60;border-radius:14px;padding:10px 20px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 32px rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:all .25s}
+#ho-floating-bar.visible{opacity:1;pointer-events:all;transform:translateX(-50%) translateY(0)}
+#ho-mode-banner{display:none;background:linear-gradient(135deg,#1a3a2a,#152336);border-bottom:2px solid #27ae60;padding:8px 20px;text-align:center;font-size:13px;color:#2ecc71;font-weight:600}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
 @keyframes swShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
 
@@ -1210,6 +1220,30 @@ select option{background:var(--bg3)}
 </div>
 
 <!-- PAGE: TRACKING -->
+<!-- Handoff mode banner -->
+<div id="ho-mode-banner">✏️ 引継ぎモード — カードをクリックして引継ぎするCaseを選んでください <button onclick="HO.exitHandoffMode()" style="margin-left:12px;font-size:11px;padding:2px 10px;border-radius:6px;border:1px solid rgba(46,204,113,.5);background:transparent;color:#2ecc71;cursor:pointer">キャンセル</button></div>
+
+<!-- Handoff floating bar -->
+<div id="ho-floating-bar">
+  <span style="color:#2ecc71;font-weight:600" id="ho-selected-count">0 件選択中</span>
+  <button onclick="HO.exitHandoffMode()" style="font-size:12px;padding:5px 14px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer">キャンセル</button>
+  <button onclick="HO.openNoteModal()" style="font-size:12px;padding:5px 16px;border-radius:8px;border:none;background:#27ae60;color:#fff;font-weight:600;cursor:pointer">💾 引継ぎを保存</button>
+</div>
+
+<!-- Handoff note modal -->
+<div class="cm-modal" id="ho-note-modal" onclick="if(event.target===this)document.getElementById('ho-note-modal').classList.remove('open')">
+  <div class="cm-box" style="max-width:500px">
+    <div class="cm-header">📝 引継ぎメモを入力 <button onclick="document.getElementById('ho-note-modal').classList.remove('open')" style="background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;line-height:1;margin-left:auto">×</button></div>
+    <div style="padding:16px">
+      <div id="ho-note-inputs" style="max-height:50vh;overflow-y:auto"></div>
+      <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn btn-ghost" onclick="document.getElementById('ho-note-modal').classList.remove('open')">キャンセル</button>
+        <button class="btn btn-primary" onclick="HO.saveHandoff()">💾 保存する</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="page" id="page-tracking">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
     <p class="page-title">対応管理</p>
@@ -5559,9 +5593,11 @@ function renderTracking(){
 
     const trackingId = t.row ? `tracking-${t.row}` : (t.id || '');
     const isHandoff = HO._handoffCaseIds && HO._handoffCaseIds.has(trackingId);
+    const hoClick = `if(HO._hoMode){HO.toggleCard(this,'${trackingId}','${(t.question||'').replace(/'/g,'').replace(/`/g,'').substring(0,40)}','${t.channel||''}','${(t.customerEmail||t.iccid||'').substring(0,30)}');}`;
     return `
-    <div class="track-card ${statusCls} ${isHandoff ? 'handoff-card' : ''}" style="${isOverdue?'border-color:rgba(231,76,60,.6);background:rgba(231,76,60,.05)':''}">
+    <div class="track-card ${statusCls} ${isHandoff ? 'handoff-card' : ''}" style="${isOverdue?'border-color:rgba(231,76,60,.6);background:rgba(231,76,60,.05)':''}" onclick="${hoClick}">
       <div class="track-header">
+        <div class="ho-checkbox">✓</div>
         <span style="width:8px;height:8px;border-radius:50%;background:${statusColor};flex-shrink:0;display:inline-block"></span>
         <span style="font-size:12px;font-weight:600;color:${statusColor}">${displayStatus}</span>
         ${autoKanryo ? `<span style="font-size:10px;color:var(--text3);background:var(--bg3);padding:1px 6px;border-radius:4px">返信待ち7日経過</span>` : ''}
@@ -7414,39 +7450,66 @@ const HO = {
   BANNER_TTL: 16 * 60 * 60 * 1000, // 16 hours
 
   openHandoff() {
-    // Ensure tracking data is loaded before showing handoff
+    // Switch to tracking tab and enter handoff mode
     if (!SHEET_TRACKING.length) {
       loadTrackingFromSheet().then(() => this.openHandoff());
       return;
     }
-    const cases = this._getActiveCases();
-    const listEl = document.getElementById('handoff-cases-list');
-    if (!listEl) return;
-    if (!cases.length) {
-      listEl.innerHTML = `<div style="text-align:center;padding:20px 0;color:var(--success)">
-        <div style="font-size:32px;margin-bottom:8px">👍</div>
-        <div style="font-size:14px">対応中のCaseはありません！</div>
-      </div>`;
+    goPage('tracking', document.querySelector('.nav-item[onclick*="tracking"]'));
+    this._hoMode = true;
+    this._selectedCases = {};
+    document.getElementById('tracking-list').classList.add('ho-mode');
+    document.getElementById('ho-mode-banner').style.display = 'block';
+    renderTracking();
+    this._updateFloatingBar();
+  },
+
+  exitHandoffMode() {
+    this._hoMode = false;
+    this._selectedCases = {};
+    document.getElementById('tracking-list').classList.remove('ho-mode');
+    document.getElementById('ho-mode-banner').style.display = 'none';
+    document.getElementById('ho-floating-bar').classList.remove('visible');
+    renderTracking();
+  },
+
+  toggleCard(el, caseId, label, channel, sub) {
+    if (!this._hoMode) return;
+    const card = el.closest('.track-card');
+    if (!card) return;
+    if (this._selectedCases[caseId]) {
+      delete this._selectedCases[caseId];
+      card.classList.remove('ho-selected');
     } else {
-      listEl.innerHTML = cases.map((c, i) => `
-        <div style="padding:12px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;background:var(--bg3)">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-            <span style="font-size:12px;color:var(--text2)">${c.customer_name || '—'}</span>
-            ${c.channel ? `<span style="font-size:10px;padding:1px 6px;background:var(--bg2);border:1px solid var(--border);border-radius:4px;color:var(--text3)">${c.channel}</span>` : ''}
-          </div>
-          <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">引継ぎメモ:</label>
-          <textarea id="ho-note-${i}" rows="2" placeholder="例：PATH Bを送信済み、お客様の返信待ち..." style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-size:12px;resize:none;outline:none;font-family:var(--font)">${c._hoNote || ''}</textarea>
-        </div>`).join('');
+      this._selectedCases[caseId] = { caseId, label, channel, sub, note: '' };
+      card.classList.add('ho-selected');
     }
-    // Update modal header with staff name
-    const staffName = CM.staff ? CM.staff() : (localStorage.getItem('inplus_staff_name') || '');
-    const headerEl = document.getElementById('handoff-modal-header');
-    if (headerEl) {
-      const nameTag = staffName ? `<span style="color:var(--accent);font-size:13px;margin-left:6px">[${staffName}]</span>` : '';
-      headerEl.innerHTML = `📝 引継ぎメモを作成${nameTag} <button onclick="HO.closeHandoff()" style="background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;line-height:1;margin-left:auto">×</button>`;
-    }
-    document.getElementById('handoff-modal').classList.add('open');
-    this._cases = cases;
+    this._updateFloatingBar();
+  },
+
+  _updateFloatingBar() {
+    const count = Object.keys(this._selectedCases || {}).length;
+    const bar = document.getElementById('ho-floating-bar');
+    const countEl = document.getElementById('ho-selected-count');
+    if (countEl) countEl.textContent = `${count} 件選択中`;
+    if (bar) bar.classList.toggle('visible', count > 0);
+  },
+
+  openNoteModal() {
+    const cases = Object.values(this._selectedCases || {});
+    if (!cases.length) return;
+    const el = document.getElementById('ho-note-inputs');
+    el.innerHTML = cases.map((c, i) => `
+      <div style="padding:12px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;background:var(--bg3)">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <span style="font-size:13px;font-weight:600;color:var(--text)">${c.label}</span>
+          ${c.channel ? `<span style="font-size:10px;padding:1px 6px;background:var(--bg2);border:1px solid var(--border);border-radius:4px;color:var(--text3)">${c.channel}</span>` : ''}
+          ${c.sub ? `<span style="font-size:11px;color:var(--text3)">${c.sub}</span>` : ''}
+        </div>
+        <textarea id="ho-note-${i}" rows="2" placeholder="例：PATH Bを送信済み、お客様の返信待ち..." style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-size:12px;resize:none;outline:none;font-family:var(--font)"></textarea>
+      </div>`).join('');
+    this._noteModalCases = cases;
+    document.getElementById('ho-note-modal').classList.add('open');
   },
 
   closeHandoff() {
@@ -7454,20 +7517,20 @@ const HO = {
   },
 
   async saveHandoff() {
-    const cases = this._cases || [];
+    const cases = this._noteModalCases || [];
     const notes = cases.map((c, i) => ({
-      case_id: c.case_id,
-      customer_name: c.customer_name || '—',
+      case_id: c.caseId,
+      customer_name: c.label || '—',
       channel: c.channel || '',
-      category: c.category || '',
       note: document.getElementById(`ho-note-${i}`)?.value.trim() || ''
     }));
     const handoff = {
-      staff: CM.staff() || 'Staff',
+      staff: CM.staff ? CM.staff() : localStorage.getItem('inplus_staff_name') || 'Staff',
       saved_at: new Date().toISOString(),
       notes
     };
-    this.closeHandoff();
+    document.getElementById('ho-note-modal').classList.remove('open');
+    this.exitHandoffMode();
     showToast('📝 引継ぎメモを保存しました！');
     document.getElementById('handoff-pending-dot').style.display = 'none';
     await fetch(API_URL + '?action=saveHandoff&staff=' + encodeURIComponent(handoff.staff) + '&saved_at=' + encodeURIComponent(handoff.saved_at) + '&notes=' + encodeURIComponent(JSON.stringify(handoff.notes)));
