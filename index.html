@@ -239,6 +239,9 @@ select option{background:var(--bg3)}
 
 /* NEW BADGE */
 .new-badge{background:var(--danger);color:#fff;font-size:9px;padding:1px 6px;border-radius:3px;font-weight:700;letter-spacing:.05em;vertical-align:middle;margin-left:5px;animation:pulse 1.4s infinite}
+.handoff-badge{background:#27ae60;color:#fff;font-size:9px;padding:1px 6px;border-radius:3px;font-weight:700;letter-spacing:.05em;vertical-align:middle;margin-left:5px;animation:pulse 1.4s infinite}
+.handoff-card{outline:2px solid rgba(39,174,96,.5);outline-offset:-2px;animation:pulse-border 1.4s infinite}
+@keyframes pulse-border{0%,100%{outline-color:rgba(39,174,96,.5)}50%{outline-color:rgba(39,174,96,.15)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
 @keyframes swShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
 
@@ -5554,13 +5557,16 @@ function renderTracking(){
 
     const updateFn = t.row ? (s,l,c) => sheetBtn(s,l,c) : (s,l,c) => localBtn(s,l,c);
 
+    const trackingId = t.row ? `tracking-${t.row}` : (t.id || '');
+    const isHandoff = HO._handoffCaseIds && HO._handoffCaseIds.has(trackingId);
     return `
-    <div class="track-card ${statusCls}" style="${isOverdue?'border-color:rgba(231,76,60,.6);background:rgba(231,76,60,.05)':''}">
+    <div class="track-card ${statusCls} ${isHandoff ? 'handoff-card' : ''}" style="${isOverdue?'border-color:rgba(231,76,60,.6);background:rgba(231,76,60,.05)':''}">
       <div class="track-header">
         <span style="width:8px;height:8px;border-radius:50%;background:${statusColor};flex-shrink:0;display:inline-block"></span>
         <span style="font-size:12px;font-weight:600;color:${statusColor}">${displayStatus}</span>
         ${autoKanryo ? `<span style="font-size:10px;color:var(--text3);background:var(--bg3);padding:1px 6px;border-radius:4px">返信待ち7日経過</span>` : ''}
         ${isNew ? '<span class="new-badge">NEW</span>' : ''}
+        ${isHandoff ? '<span class="handoff-badge">引継ぎ</span>' : ''}
         ${isOverdue ? `<span style="font-size:11px;font-weight:600;color:var(--danger);background:var(--danger-bg);padding:2px 7px;border-radius:4px">⏰ ${daysOld}日経過</span>` : ''}
         <span style="font-size:11px;color:var(--text3);margin-left:8px">${chIcon[t.channel]||'📌'} ${t.channel||'不明'}</span>
         <span style="font-size:11px;color:var(--text3);margin-left:auto">${(t.date||'').replace('T',' ').substring(0,16)}</span>
@@ -7542,6 +7548,7 @@ const HO = {
     const readByEl = document.getElementById('handoff-banner-readby');
     if (!banner || !listEl) return;
     this._currentHandoffId = handoff.id || '';
+    this._currentHandoff = handoff;
     const t = new Date(handoff.saved_at);
     const timeStr = `${t.getHours().toString().padStart(2,'0')}:${t.getMinutes().toString().padStart(2,'0')}`;
     const dateStr = t.toLocaleDateString('ja-JP', {month:'numeric',day:'numeric'});
@@ -7566,6 +7573,13 @@ const HO = {
     const banner = document.getElementById('handoff-banner');
     if (banner) banner.style.display = 'none';
     document.querySelector('.main').style.paddingTop = '';
+    // Store handoff case IDs for card highlighting
+    if (this._currentHandoff) {
+      this._handoffCaseIds = new Set(
+        (this._currentHandoff.notes || []).filter(n => n.note).map(n => n.case_id)
+      );
+      renderTracking();
+    }
   },
 
   _openCase(caseId) {
