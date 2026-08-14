@@ -7727,9 +7727,6 @@ const HO = {
           card.style.transition = 'outline .1s';
           card.style.outline = '3px solid var(--accent)';
           setTimeout(() => card.style.outline = '', 2000);
-          // Auto-open the 履歴 modal for this card
-          const histBtn = card.querySelector('[data-subject]');
-          if (histBtn) setTimeout(() => histBtn.click(), 300);
           break;
         }
       }
