@@ -7700,19 +7700,17 @@ const HO = {
     this._currentHandoff = handoff;
     const myStaff = CM.staff ? CM.staff() : localStorage.getItem('inplus_staff_name') || '';
 
-    // Load all unread handoffs
+    // Load all recent handoffs within TTL
     let allHandoffs = [handoff];
     try {
       const res = await fetch(API_URL + '?action=getHandoffList');
       const list = await res.json();
-      allHandoffs = list.filter(h => {
+      const recent = list.filter(h => {
         if (!h.saved_at) return false;
         const age = Date.now() - new Date(h.saved_at).getTime();
-        if (age > this.BANNER_TTL) return false;
-        if (h.staff === myStaff) return false;
-        return true;
+        return age <= this.BANNER_TTL;
       });
-      if (!allHandoffs.length) allHandoffs = [handoff];
+      if (recent.length) allHandoffs = recent;
     } catch(e) {}
 
     this._bannerNotes = {};
@@ -7748,6 +7746,7 @@ const HO = {
   },
 
   _openCase(caseId) {
+    this.closeBanner();
     const n = (this._bannerNotes || {})[caseId];
     const customerName = n ? n.customer_name : '';
     const note = n ? n.note : '';
