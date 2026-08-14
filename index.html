@@ -1421,9 +1421,9 @@ select option{background:var(--bg3)}
       <button onclick="HO.closeHandoff()" style="background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;line-height:1">×</button>
     </div>
     <div style="padding:16px">
-      <div id="handoff-tab-create">
-        <div id="handoff-cases-list"></div>
-        <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end">
+      <div id="handoff-tab-create" style="display:flex;flex-direction:column;height:100%">
+        <div id="handoff-cases-list" style="overflow-y:auto;max-height:55vh;padding-right:4px"></div>
+        <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;flex-shrink:0">
           <button class="btn btn-ghost" onclick="HO.closeHandoff()">キャンセル</button>
           <button class="btn btn-primary" onclick="HO.saveHandoff()">💾 引継ぎを保存</button>
         </div>
@@ -7425,7 +7425,6 @@ const HO = {
       listEl.innerHTML = cases.map((c, i) => `
         <div style="padding:12px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;background:var(--bg3)">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-            <span style="font-size:12px;font-weight:700;color:var(--accent)">${c.case_id}</span>
             <span style="font-size:12px;color:var(--text2)">${c.customer_name || '—'}</span>
             ${c.channel ? `<span style="font-size:10px;padding:1px 6px;background:var(--bg2);border:1px solid var(--border);border-radius:4px;color:var(--text3)">${c.channel}</span>` : ''}
           </div>
