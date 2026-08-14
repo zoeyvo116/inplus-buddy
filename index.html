@@ -8173,6 +8173,14 @@ loadTrackingFromSheet();
 CM.init();
 CT.init();
 setTimeout(() => { HO.checkBanner(); HO.startAutoCheck(); }, 1200);
+
+// ESC closes any open modal
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if (HO._hoMode) { HO.exitHandoffMode(); return; }
+  const open = document.querySelector('.cm-modal.open');
+  if (open) { open.dispatchEvent(new MouseEvent('click', {bubbles:true})); open.classList.remove('open'); }
+});
 // Init staff indicator
 (()=>{
   const n=localStorage.getItem('inplus_staff_name')||'';
