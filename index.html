@@ -1275,13 +1275,7 @@ select option{background:var(--bg3)}
   </div>
 
   <!-- STALE ALERT -->
-  <div id="stale-alert" style="display:none;background:var(--danger-bg);border:1px solid var(--danger);border-radius:10px;padding:12px 14px;margin-bottom:14px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-      <span style="font-size:13px;font-weight:700;color:var(--danger)">⏰ 3日以上更新がないケース</span>
-      <button onclick="document.getElementById('stale-alert').style.display='none'" style="background:none;border:none;color:var(--text3);font-size:16px;cursor:pointer;line-height:1">×</button>
-    </div>
-    <div id="stale-list" style="display:flex;flex-direction:column;gap:6px"></div>
-  </div>
+  <div id="stale-alert" style="display:none"><div id="stale-list"></div></div>
 
   <!-- FILTER STATUS -->
   <div class="chips" style="margin-bottom:8px" id="tr-filter-chips">
@@ -7675,9 +7669,9 @@ const HO = {
     if (titleEl) titleEl.textContent = `👋 ${handoff.staff} からの引継ぎ — ${isToday ? '本日' : dateStr} ${timeStr}`;
     listEl.innerHTML = (handoff.notes || []).filter(n => n.note).map(n => `
       <div style="background:rgba(39,174,96,.1);border:1px solid rgba(39,174,96,.2);border-radius:6px;padding:7px 12px;min-width:200px;max-width:320px">
-        <div style="font-size:11px;font-weight:700;color:#2ecc71;margin-bottom:2px">${n.case_id} ${n.customer_name}</div>
+        <div style="font-size:11px;font-weight:700;color:#2ecc71;margin-bottom:2px">${n.customer_name}</div>
         <div style="font-size:12px;color:var(--text2)">${n.note}</div>
-        <button onclick="HO._openCase('${n.case_id}')" style="margin-top:5px;font-size:10px;padding:1px 8px;background:rgba(39,174,96,.2);border:1px solid rgba(39,174,96,.4);border-radius:4px;color:#2ecc71;cursor:pointer">→ Caseを開く</button>
+        <button onclick="HO._openCase('${n.case_id}')" style="margin-top:5px;font-size:10px;padding:1px 8px;background:rgba(39,174,96,.2);border:1px solid rgba(39,174,96,.4);border-radius:4px;color:#2ecc71;cursor:pointer">→ 開く</button>
       </div>`).join('');
     if (!listEl.innerHTML.trim()) {
       listEl.innerHTML = `<div style="font-size:12px;color:var(--text3);font-style:italic">引継ぎメモなし</div>`;
@@ -7703,8 +7697,21 @@ const HO = {
 
   _openCase(caseId) {
     this.closeBanner();
-    CM.loadCase(caseId);
     goPage('tracking', document.querySelector('.nav-item[onclick*="tracking"]'));
+    setTimeout(() => {
+      // Scroll to and highlight the card
+      const cards = document.querySelectorAll('.track-card');
+      for (const card of cards) {
+        const onclick = card.getAttribute('onclick') || '';
+        if (onclick.includes(caseId)) {
+          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          card.style.transition = 'outline .1s';
+          card.style.outline = '3px solid var(--accent)';
+          setTimeout(() => card.style.outline = '', 2000);
+          break;
+        }
+      }
+    }, 400);
   },
 
   _getActiveCases() {
