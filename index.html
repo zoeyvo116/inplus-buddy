@@ -7565,7 +7565,11 @@ const HO = {
       this._currentHandoff = handoff;
       this._handoffCaseIds = new Set((handoff.notes||[]).filter(n=>n.note).map(n=>n.case_id));
       renderTracking && renderTracking();
-      // Banner auto-popup removed — cards show handoff badge instead
+      const myStaff = CM.staff ? CM.staff() : '';
+      if (handoff.staff === myStaff && age < 60000) return;
+      const readBy = handoff.read_by || [];
+      if (myStaff && readBy.includes(myStaff)) return;
+      this._showBanner(handoff);
     } catch(e) {}
   },
 
