@@ -7687,11 +7687,13 @@ const HO = {
     const dateStr = t.toLocaleDateString('ja-JP', {month:'numeric',day:'numeric'});
     const isToday = new Date().toDateString() === t.toDateString();
     if (titleEl) titleEl.textContent = `👋 ${handoff.staff} からの引継ぎ — ${isToday ? '本日' : dateStr} ${timeStr}`;
+    this._bannerNotes = {};
+    (handoff.notes || []).filter(n => n.note).forEach(n => { this._bannerNotes[n.case_id] = n; });
     listEl.innerHTML = (handoff.notes || []).filter(n => n.note).map(n => `
       <div style="background:rgba(39,174,96,.1);border:1px solid rgba(39,174,96,.2);border-radius:6px;padding:7px 12px;min-width:200px;max-width:320px">
         <div style="font-size:11px;font-weight:700;color:#2ecc71;margin-bottom:2px">${n.customer_name}</div>
         <div style="font-size:12px;color:var(--text2)">${n.note}</div>
-        <button onclick="HO._openCase('${n.case_id}','${(n.customer_name||'').replace(/'/g,'')}','${(n.note||'').replace(/'/g,'\\'').replace(/\n/g,'\\n')}')" style="margin-top:5px;font-size:10px;padding:1px 8px;background:rgba(39,174,96,.2);border:1px solid rgba(39,174,96,.4);border-radius:4px;color:#2ecc71;cursor:pointer">→ 開く</button>
+        <button onclick="HO._openCase('${n.case_id}')" style="margin-top:5px;font-size:10px;padding:1px 8px;background:rgba(39,174,96,.2);border:1px solid rgba(39,174,96,.4);border-radius:4px;color:#2ecc71;cursor:pointer">→ 開く</button>
       </div>`).join('');
     if (!listEl.innerHTML.trim()) {
       listEl.innerHTML = `<div style="font-size:12px;color:var(--text3);font-style:italic">引継ぎメモなし</div>`;
@@ -7715,7 +7717,10 @@ const HO = {
     }
   },
 
-  _openCase(caseId, customerName, note) {
+  _openCase(caseId) {
+    const n = (this._bannerNotes || {})[caseId];
+    const customerName = n ? n.customer_name : '';
+    const note = n ? n.note : '';
     // Show note modal if note exists
     if (note) {
       const m = document.createElement('div');
