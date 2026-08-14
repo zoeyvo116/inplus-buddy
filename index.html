@@ -5600,13 +5600,13 @@ function renderTracking(){
     const hoClick = `if(HO._hoMode){HO.toggleCard(this,'${trackingId}','${(t.question||'').replace(/'/g,'').replace(/`/g,'').substring(0,40)}','${t.channel||''}','${(t.customerEmail||t.iccid||'').substring(0,30)}');}`;
     return `
     <div class="track-card ${statusCls} ${isHandoff ? 'handoff-card' : ''}" style="${isOverdue?'border-color:rgba(231,76,60,.6);background:rgba(231,76,60,.05)':''}" onclick="${hoClick}">
+      ${isHandoff ? '<div class="handoff-badge">🔖 引継ぎ</div>' : ''}
       <div class="track-header">
         <div class="ho-checkbox">✓</div>
         <span style="width:8px;height:8px;border-radius:50%;background:${statusColor};flex-shrink:0;display:inline-block"></span>
         <span style="font-size:12px;font-weight:600;color:${statusColor}">${displayStatus}</span>
         ${autoKanryo ? `<span style="font-size:10px;color:var(--text3);background:var(--bg3);padding:1px 6px;border-radius:4px">返信待ち7日経過</span>` : ''}
         ${isNew ? '<span class="new-badge">NEW</span>' : ''}
-        ${isHandoff ? '<span class="handoff-badge">引継ぎ</span>' : ''}
         ${isOverdue ? `<span style="font-size:11px;font-weight:600;color:var(--danger);background:var(--danger-bg);padding:2px 7px;border-radius:4px">⏰ ${daysOld}日経過</span>` : ''}
         <span style="font-size:11px;color:var(--text3);margin-left:8px">${chIcon[t.channel]||'📌'} ${t.channel||'不明'}</span>
         <span style="font-size:11px;color:var(--text3);margin-left:auto">${(t.date||'').replace('T',' ').substring(0,16)}</span>
@@ -7613,7 +7613,7 @@ const HO = {
         const dateStr = `${t.getMonth()+1}/${t.getDate()} ${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}`;
         const readBy = (h.read_by || []).join(', ');
         const notes = (h.notes || []).filter(n => n.note);
-        return `<div style="border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px;background:var(--bg3)">
+        return `<div data-handoff-id="${h.id}" style="border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px;background:var(--bg3)">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
             <span style="font-weight:600;color:var(--accent)">${h.staff} <span style="font-size:11px;color:var(--text3);font-weight:400">${dateStr}</span></span>
             <button onclick="HO.deleteHandoff('${h.id}')" style="font-size:11px;padding:2px 8px;border-radius:6px;border:1px solid var(--danger);color:var(--danger);background:transparent;cursor:pointer">🗑 削除</button>
@@ -7638,9 +7638,11 @@ const HO = {
 
   async deleteHandoff(id) {
     if (!confirm('この引継ぎを削除しますか？')) return;
-    await fetch(API_URL + '?action=deleteHandoff&id=' + encodeURIComponent(id));
-    this.loadHistory();
+    // Remove from DOM immediately
+    const el = document.querySelector(`[data-handoff-id="${id}"]`);
+    if (el) el.remove();
     showToast('🗑 削除しました');
+    fetch(API_URL + '?action=deleteHandoff&id=' + encodeURIComponent(id));
   },
 
   carryOver(caseId, label, channel) {
