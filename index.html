@@ -411,13 +411,14 @@ body{
 }
 .glass-staff-chip:hover{background:rgba(255,255,255,.18);color:#fff}
 /* Main area: sidebar + content */
-.glass-main{display:flex;flex:1;min-height:0}
+.glass-main{display:flex;flex:1}
 /* Slim icon sidebar */
 .glass-sidebar{
   width:64px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:4px;
   background:rgba(255,255,255,0.4);
   backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
   border-right:1px solid rgba(255,255,255,0.5);
+  overflow:visible;
 }
 .glass-sidebar-icon{
   width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;
@@ -524,18 +525,18 @@ body{
 <nav class="glass-topnav">
   <div class="glass-topnav-logo">
     <div class="glass-topnav-logo-mark">
-      <svg width="28" height="22" viewBox="0 0 42 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg width="26" height="20" viewBox="0 0 52 38" fill="none" xmlns="http://www.w3.org/2000/svg">
         <!-- I -->
-        <rect x="0" y="0" width="5" height="22" rx="1" fill="white"/>
-        <!-- N (angular) -->
-        <rect x="8" y="0" width="4.5" height="22" rx="1" fill="white"/>
-        <polygon points="12.5,0 12.5,11 20,0" fill="white"/>
-        <rect x="17.5" y="0" width="4.5" height="22" rx="1" fill="white"/>
-        <!-- + (4 triangles) -->
-        <polygon points="26,5 31,11 26,11" fill="white"/>
-        <polygon points="37,5 32,11 37,11" fill="white"/>
-        <polygon points="26,17 31,11 26,11" fill="white"/>
-        <polygon points="37,17 32,11 37,11" fill="white"/>
+        <rect x="0" y="0" width="6" height="26" fill="white"/>
+        <!-- N: left bar + diagonal + right bar -->
+        <rect x="10" y="0" width="6" height="26" fill="white"/>
+        <polygon points="16,0 22,0 16,14" fill="white"/>
+        <rect x="22" y="0" width="6" height="26" fill="white"/>
+        <!-- + : 4 rectangular blocks in cross pattern -->
+        <rect x="31" y="0" width="9" height="11" fill="white"/>
+        <rect x="42" y="0" width="9" height="11" fill="white"/>
+        <rect x="31" y="14" width="9" height="11" fill="white"/>
+        <rect x="42" y="14" width="9" height="11" fill="white"/>
       </svg>
     </div>
     <span class="glass-topnav-logo-text">INPLUS</span>
