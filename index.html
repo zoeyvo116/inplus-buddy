@@ -366,24 +366,26 @@ body{display:flex!important;flex-direction:column;min-height:100vh}
 .layout{flex:1;grid-template-columns:54px 1fr;min-height:0}
 /* Black topbar */
 .app-topbar{height:48px;background:#111;display:flex;align-items:center;padding:0 20px;gap:4px;flex-shrink:0;z-index:200;position:sticky;top:0}
-.app-topbar-logo{font-size:14px;font-weight:800;color:#fff;letter-spacing:.04em;white-space:nowrap;margin-right:12px}
-.app-topbar-logo b{color:#A3E635}
+.app-topbar-logo{font-size:14px;color:#fff;letter-spacing:.05em;white-space:nowrap;margin-right:12px;display:flex;align-items:center;gap:7px}
+.app-topbar-logo .logo-mark{width:24px;height:24px;background:#E8008A;border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.app-topbar-logo .logo-text .in{font-weight:300}
+.app-topbar-logo .logo-text .plus{font-weight:800}
 .atn{font-size:11px;font-weight:500;color:#777;padding:5px 11px;border-radius:99px;cursor:pointer;transition:.15s;white-space:nowrap;user-select:none}
 .atn:hover{color:#fff;background:rgba(255,255,255,.1)}
 .atn.on{color:#fff;background:#333;font-weight:600}
 .app-topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px}
 .tb-staff{font-size:11px;color:#777;cursor:pointer;display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:99px;transition:.15s}
 .tb-staff:hover{color:#fff;background:rgba(255,255,255,.1)}
-/* Glassmorphism pink sidebar – icon only, white monochrome */
+/* Dark frosted glass sidebar – icon only, white monochrome */
 body{background:linear-gradient(150deg,#fff0f5 0%,#F7F4EF 55%,#fce7f3 100%)!important}
-.sidebar{background:rgba(236,72,153,.13)!important;backdrop-filter:blur(14px) saturate(140%)!important;-webkit-backdrop-filter:blur(14px) saturate(140%)!important;border-right:1px solid rgba(255,255,255,.35)!important;padding:10px 0!important;overflow:hidden!important;width:56px!important}
+.sidebar{background:rgba(18,10,22,.58)!important;backdrop-filter:blur(16px) saturate(120%)!important;-webkit-backdrop-filter:blur(16px) saturate(120%)!important;border-right:1px solid rgba(255,255,255,.08)!important;padding:10px 0!important;overflow:hidden!important;width:56px!important}
 .layout{grid-template-columns:56px 1fr!important}
 .sidebar .logo,.sidebar .nav-section,.sidebar .theme-toggle{display:none!important}
 .sidebar .nav-item{font-size:0!important;padding:10px 0!important;justify-content:center!important;align-items:center!important;margin:2px 5px!important;border-radius:12px!important;background:transparent!important}
-.sidebar .nav-item .nav-icon{font-size:20px!important;width:auto!important;filter:brightness(0) invert(1)!important;opacity:.55!important;transition:opacity .15s!important}
-.sidebar .nav-item:hover{background:rgba(255,255,255,.18)!important}
-.sidebar .nav-item:hover .nav-icon{opacity:.85!important}
-.sidebar .nav-item.on{background:rgba(255,255,255,.22)!important}
+.sidebar .nav-item .nav-icon{font-size:20px!important;width:auto!important;filter:brightness(0) invert(1)!important;opacity:.6!important;transition:opacity .15s!important}
+.sidebar .nav-item:hover{background:rgba(255,255,255,.12)!important}
+.sidebar .nav-item:hover .nav-icon{opacity:.9!important}
+.sidebar .nav-item.on{background:rgba(255,255,255,.18)!important}
 .sidebar .nav-item.on .nav-icon{opacity:1!important}
 #staff-indicator{justify-content:center!important;padding:10px 0!important;margin:2px 5px!important;font-size:0!important}
 #staff-indicator-name,#staff-indicator>span:last-child{display:none!important}
@@ -417,7 +419,17 @@ body{background:linear-gradient(150deg,#fff0f5 0%,#F7F4EF 55%,#fce7f3 100%)!impo
 
 <!-- APP TOPBAR -->
 <div class="app-topbar">
-  <div class="app-topbar-logo">IN+<b>PLUS</b></div>
+  <div class="app-topbar-logo">
+    <div class="logo-mark">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="1" y="1" width="2.2" height="12" fill="white"/>
+        <polygon points="4,1 7.5,7 4,13" fill="white"/>
+        <rect x="8.5" y="6" width="4.5" height="2" fill="white"/>
+        <rect x="11" y="3.5" width="2" height="7" fill="white"/>
+      </svg>
+    </div>
+    <div class="logo-text"><span class="in">IN</span><span class="plus">PLUS</span></div>
+  </div>
   <div class="atn on" data-page="template" onclick="goPage('template', document.querySelector('.nav-item[onclick*=template]'))">📝 テンプレート</div>
   <div class="atn" data-page="apn" onclick="goPage('apn', document.querySelector('.nav-item[onclick*=apn]'))">📡 APN</div>
   <div class="atn" data-page="plandb" onclick="goPage('plandb', document.querySelector('.nav-item[onclick*=plandb]'))">🗂 プラン</div>
