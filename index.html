@@ -365,23 +365,31 @@ body{
   min-height:100vh;
   background: linear-gradient(135deg, #c8e6f5 0%, #dce8f7 30%, #e8d5f0 60%, #f5d5e8 100%) !important;
   background-attachment: fixed !important;
+  display:flex;align-items:center;justify-content:center;padding:16px;
+}
+/* Outer frame — rounded border wrapping the whole app */
+.glass-frame{
+  width:100%;max-width:1440px;height:calc(100vh - 32px);
+  border-radius:28px;
+  border:2px solid #17161A;
+  overflow:hidden;
+  display:flex;flex-direction:column;
+  box-shadow:0 8px 40px rgba(0,0,0,0.18);
 }
 /* App shell: top nav + slim icon sidebar + content */
-.glass-shell{display:flex;flex-direction:column;min-height:100vh}
+.glass-shell{display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden}
 /* Top nav */
 .glass-topnav{
   height:58px;display:flex;align-items:center;padding:0 20px;gap:8px;flex-shrink:0;
-  position:sticky;top:0;z-index:300;
+  position:relative;z-index:300;
   background:#17161A;
-  box-shadow:0 2px 20px rgba(0,0,0,0.18);
-  border-radius:0 0 28px 28px;
+  box-shadow:0 2px 16px rgba(0,0,0,0.2);
 }
 /* curved tail pointing down from center of topnav */
 .glass-topnav::after{
-  content:'';position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);
-  width:80px;height:16px;background:#17161A;
-  clip-path:ellipse(40px 16px at 50% 0%);
-  border-radius:0 0 40px 40px;
+  content:'';position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);
+  width:100px;height:18px;background:#17161A;
+  clip-path:ellipse(50px 18px at 50% 0%);
 }
 .glass-topnav-logo{display:flex;align-items:center;gap:9px;margin-right:16px;flex-shrink:0}
 .glass-topnav-logo-mark{width:34px;height:34px;border-radius:9px;background:#DB0074;display:flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -389,13 +397,12 @@ body{
 /* nav centered */
 .glass-topnav-nav{display:flex;align-items:center;gap:2px;position:absolute;left:50%;transform:translateX(-50%)}
 .glass-topnav-item{
-  display:flex;align-items:center;justify-content:center;
-  width:38px;height:38px;border-radius:12px;
-  cursor:pointer;color:rgba(255,255,255,0.45);
-  transition:all .15s;border:none;background:transparent;flex-shrink:0;
+  display:flex;align-items:center;gap:7px;padding:7px 13px;border-radius:10px;
+  cursor:pointer;font-size:13px;font-weight:500;color:rgba(255,255,255,0.5);
+  transition:all .15s;white-space:nowrap;border:none;background:transparent;flex-shrink:0;
 }
 .glass-topnav-item:hover{background:rgba(255,255,255,0.1);color:rgba(255,255,255,.85)}
-.glass-topnav-item.on{background:rgba(219,0,116,0.3);color:#fff}
+.glass-topnav-item.on{background:rgba(219,0,116,0.25);color:#fff;font-weight:700}
 .glass-topnav-item svg{opacity:.7;transition:opacity .15s}
 .glass-topnav-item:hover svg,.glass-topnav-item.on svg{opacity:1}
 .glass-topnav-right{margin-left:auto;display:flex;align-items:center;gap:6px}
@@ -520,6 +527,7 @@ body{
 <body>
 <div id="loading-banner" style="position:fixed;top:0;left:0;right:0;z-index:9999;background:#DB0074;color:#fff;text-align:center;padding:8px;font-size:13px;font-family:var(--font)">データを読み込み中...</div>
 
+<div class="glass-frame">
 <div class="glass-shell">
 
 <!-- TOP NAV -->
@@ -531,15 +539,15 @@ body{
     </div>
     <span class="glass-topnav-logo-text">INPLUS</span>
   </div>
-  <!-- Nav: icon-only, centered -->
+  <!-- Nav: icon + text, centered -->
   <div class="glass-topnav-nav">
-    <div class="glass-topnav-item on" data-page="template" onclick="goPage('template',this)" title="テンプレート生成"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="14" rx="3"></rect><path d="M7 9h10M7 13h6"></path></svg></div>
-    <div class="glass-topnav-item" data-page="apn" onclick="goPage('apn',this)" title="APN検索"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4.5 12a7.5 7.5 0 0115 0"></path><path d="M8 14.5a4 4 0 018 0"></path><circle cx="12" cy="18.5" r="1.3"></circle></svg></div>
-    <div class="glass-topnav-item" data-page="plandb" onclick="goPage('plandb',this)" title="プラン検索"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="7" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="13" width="7" height="7" rx="2"></rect></svg></div>
-    <div class="glass-topnav-item" data-page="custom-tmpl" onclick="goPage('custom-tmpl',this)" title="ケース学習"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 5.5A2.5 2.5 0 017.5 3H19v15H7.5A2.5 2.5 0 005 20.5z"></path><path d="M9 3v15"></path></svg></div>
-    <div class="glass-topnav-item" data-page="tracking" onclick="goPage('tracking',this)" title="対応履歴"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="5" y="3.5" width="14" height="17" rx="3"></rect><path d="M9 8.5h6M9 12.5h6M9 16.5h3"></path></svg></div>
-    <div class="glass-topnav-item" data-page="report" onclick="goPage('report',this)" title="週次レポート"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 20h16"></path><rect x="6" y="11" width="3.4" height="6"></rect><rect x="11" y="7" width="3.4" height="10"></rect><rect x="16" y="13" width="3.4" height="4"></rect></svg></div>
-    <div class="glass-topnav-item" data-page="kb" onclick="goPage('kb',this)" title="Q&Aナレッジ"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="10" r="5.5"></circle><path d="M10 18.5h4M10.5 21h3"></path></svg></div>
+    <div class="glass-topnav-item on" data-page="template" onclick="goPage('template',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="14" rx="3"></rect><path d="M7 9h10M7 13h6"></path></svg>テンプレート</div>
+    <div class="glass-topnav-item" data-page="apn" onclick="goPage('apn',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4.5 12a7.5 7.5 0 0115 0"></path><path d="M8 14.5a4 4 0 018 0"></path><circle cx="12" cy="18.5" r="1.3"></circle></svg>APN</div>
+    <div class="glass-topnav-item" data-page="plandb" onclick="goPage('plandb',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="7" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="13" width="7" height="7" rx="2"></rect></svg>プラン</div>
+    <div class="glass-topnav-item" data-page="custom-tmpl" onclick="goPage('custom-tmpl',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 5.5A2.5 2.5 0 017.5 3H19v15H7.5A2.5 2.5 0 005 20.5z"></path><path d="M9 3v15"></path></svg>ケース</div>
+    <div class="glass-topnav-item" data-page="tracking" onclick="goPage('tracking',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="5" y="3.5" width="14" height="17" rx="3"></rect><path d="M9 8.5h6M9 12.5h6M9 16.5h3"></path></svg>履歴</div>
+    <div class="glass-topnav-item" data-page="report" onclick="goPage('report',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 20h16"></path><rect x="6" y="11" width="3.4" height="6"></rect><rect x="11" y="7" width="3.4" height="10"></rect><rect x="16" y="13" width="3.4" height="4"></rect></svg>レポート</div>
+    <div class="glass-topnav-item" data-page="kb" onclick="goPage('kb',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="10" r="5.5"></circle><path d="M10 18.5h4M10.5 21h3"></path></svg>Q&A</div>
   </div>
   <!-- Right: staff chip + action buttons -->
   <div class="glass-topnav-right">
@@ -1879,6 +1887,7 @@ body{
 </div><!-- /glass-content -->
 </div><!-- /glass-main -->
 </div><!-- /glass-shell -->
+</div><!-- /glass-frame -->
 <div class="toast" id="toast"></div>
 
 <!-- BOTTOM NAV (mobile only) -->
