@@ -506,6 +506,49 @@ body{
 [data-ch="shopify"] .preview-header .ph-label{color:#059669}
 /* Per-channel preview box — override old per-channel colors */
 [data-ch] .tmpl-preview-wrap .preview-out{background:var(--bg2)!important;border:none!important}
+
+/* ===== TEMPLATE PAGE: V8 INNER LAYOUT ===== */
+/* Head band */
+#page-template>.page-head-band{
+  position:relative;border-radius:20px;padding:18px 22px;margin-bottom:14px;overflow:hidden;
+  background:linear-gradient(100deg,#FBE0EE 0%,#FDEFE1 62%,#FAF7F3 100%);
+}
+#page-template>.page-head-band .page-title{margin-bottom:2px!important;color:var(--text)!important}
+#page-template>.page-head-band .page-sub{margin-bottom:0!important;color:#8A8078!important}
+[data-ch="line"] #page-template>.page-head-band{background:linear-gradient(100deg,#DFF2E9 0%,#EFF7F0 62%,#FAF7F3 100%)}
+[data-ch="yahoo"] #page-template>.page-head-band{background:linear-gradient(100deg,#EDE4FD 0%,#F5EFFB 62%,#FAF7F3 100%)}
+[data-ch="メール"] #page-template>.page-head-band,[data-ch="mail"] #page-template>.page-head-band{background:linear-gradient(100deg,#E3EDFD 0%,#EFF3FB 62%,#FAF7F3 100%)}
+/* Stepper */
+#tmpl-stepper{display:flex;align-items:center;background:rgba(255,255,255,0.8);border-radius:18px;padding:12px 20px;margin-bottom:14px;box-shadow:0 3px 14px rgba(23,22,26,.05);backdrop-filter:blur(12px)}
+.tst{display:flex;align-items:center;gap:9px;white-space:nowrap}
+.tst-n{width:25px;height:25px;border-radius:99px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;border:1.5px solid #D9D3CC;color:#A19B95}
+.tst-l{font-size:13px;color:#A19B95}
+.tst.done .tst-n{background:#DFF2E9;border-color:transparent;color:#1F8A5B}
+.tst.done .tst-l{color:var(--text2);font-weight:500}
+.tst.on{background:#FBE0EE;border-radius:99px;padding:4px 14px 4px 4px;margin:-4px 0}
+.tst.on .tst-n{background:var(--accent);border-color:transparent;color:#fff}
+.tst.on .tst-l{color:#A3196C;font-weight:700}
+.tst-bar{flex:1;height:2px;background:#EFEBE6;margin:0 12px;min-width:12px}
+.tst-bar.done{background:#DFF2E9}
+@media(max-width:600px){#tmpl-stepper{overflow-x:auto;padding:10px 12px}.tst-l{font-size:12px}}
+/* Form grid: label column + chips column */
+#page-template #tmpl-form-col>.card{display:grid;grid-template-columns:104px minmax(0,1fr);column-gap:18px;row-gap:0;align-items:center}
+#page-template #tmpl-form-col>.card>*{grid-column:1/-1}
+#page-template #tmpl-form-col>.card .grid2,#page-template #tmpl-form-col>.card .grid2>div,#page-template #tmpl-form-col>.card #case-section{display:contents}
+#page-template #tmpl-form-col>.card .label{grid-column:1;align-self:center;margin:0!important;padding:13px 0;text-align:right;font-size:11.5px!important;border-top:1px solid transparent}
+#page-template #tmpl-form-col>.card .chips{grid-column:2;margin:0!important;padding:11px 0;gap:7px!important;border-top:1px solid #F2EFEB}
+#page-template #tmpl-form-col>.card .card-title+.label,#page-template #tmpl-form-col>.card .card-title+.label+.chips{border-top:none}
+/* Chips — rectangular, pink active */
+#page-template .chip{height:34px;padding:0 14px!important;border-radius:10px!important;display:inline-flex;align-items:center;font-size:13px!important;background:#F4F1ED!important;border:1px solid transparent!important;color:#6E6961!important;font-weight:500!important}
+#page-template .chip:hover{background:#EDE8E2!important;color:#3A3740!important}
+#page-template .chip.on{background:#DB0074!important;border-color:#DB0074!important;color:#fff!important;font-weight:700!important;box-shadow:0 2px 8px rgba(219,0,116,.28)!important}
+#page-template .chip.warn{background:#FEF3E7!important;color:#B94B1A!important}
+#page-template .chip.warn.on{background:#DB0074!important;color:#fff!important}
+/* Form col layout */
+#tmpl-form-col{display:flex;flex-direction:column;gap:14px}
+#tmpl-form-col>.card{margin:0!important}
+/* Split: responsive */
+@media(min-width:1040px){.tmpl-split{grid-template-columns:minmax(380px,1fr) minmax(320px,42%)!important;gap:20px!important}}
 </style>
 </head>
 <body>
@@ -602,13 +645,14 @@ body{
 
 <!-- PAGE: TEMPLATE -->
 <div class="page on" id="page-template">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-    <p class="page-title" style="margin-bottom:0">テンプレート生成</p>
-    <div style="display:flex;gap:8px;align-items:center">
+  <div class="page-head-band">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+      <p class="page-title" style="margin-bottom:0">テンプレート生成</p>
       <button onclick="resetCase()" style="display:flex;align-items:center;gap:8px;padding:9px 20px;background:var(--accent);border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;transition:.15s;box-shadow:0 2px 8px rgba(240,78,140,.35)" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'" title="Cmd+R">🔄 新規対応</button>
     </div>
+    <p class="page-sub">お客様情報を入力すると右側にリアルタイムでプレビューが表示されます</p>
   </div>
-  <p class="page-sub">お客様情報を入力すると右側にリアルタイムでプレビューが表示されます</p>
+  <div id="tmpl-stepper"></div>
 
   <div class="tmpl-split">
     <!-- LEFT: FORM -->
@@ -8662,6 +8706,41 @@ document.addEventListener('click', e => {
       document.getElementById('pw-input').focus();
     }
   };
+})();
+</script>
+
+<script>
+/* Stepper for template page */
+(function(){
+  const STEPS = [
+    { label:'チャンネル', done: () => !!S.ch },
+    { label:'カテゴリ',   done: () => !!S.cat },
+    { label:'問題の種類', done: () => !!(S.case || (typeof W !== 'undefined' && W.problemType)) },
+    { label:'送信',       done: () => {
+        const el = document.getElementById('tmpl-preview');
+        const txt = ((el && el.innerText) || '').trim();
+        return !!txt && txt.length > 60 && !txt.includes('表示されます') && !el.querySelector('.preview-empty');
+      } }
+  ];
+  function render(){
+    const box = document.getElementById('tmpl-stepper');
+    if(!box || !document.getElementById('page-template')?.classList.contains('on')) return;
+    const state = STEPS.map(s => { try { return !!s.done(); } catch(e){ return false; } });
+    const cur = state.indexOf(false);
+    box.innerHTML = STEPS.map((s,i) => {
+      const cls = state[i] ? 'done' : (i === cur ? 'on' : '');
+      const num = state[i]
+        ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 12.5l4.5 4.5L19 7"></path></svg>'
+        : (i+1);
+      const bar = i < STEPS.length-1 ? '<div class="tst-bar'+(state[i]?' done':'')+'"></div>' : '';
+      return '<div class="tst '+cls+'"><div class="tst-n">'+num+'</div><div class="tst-l">'+s.label+'</div></div>'+bar;
+    }).join('');
+  }
+  let t; const kick = () => { clearTimeout(t); t = setTimeout(render, 60); };
+  document.addEventListener('click', kick, true);
+  document.addEventListener('input', kick, true);
+  document.addEventListener('change', kick, true);
+  setTimeout(render, 300);
 })();
 </script>
 </body>
