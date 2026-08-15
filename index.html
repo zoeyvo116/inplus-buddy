@@ -518,21 +518,23 @@ body{
   <!-- Logo: just text, bold -->
   <div class="glass-topnav-logo">
     <div class="glass-topnav-logo-mark">
-      <svg width="26" height="20" viewBox="0 0 78 60" fill="white">
+      <svg width="28" height="22" viewBox="0 0 82 64" fill="white">
         <!-- I: vertical bar -->
-        <rect x="0" y="0" width="8" height="60"/>
-        <!-- N: left diagonal + right diagonal (angular, no vertical bars) -->
-        <polygon points="12,60 19,60 31,0 24,0"/>
-        <polygon points="29,0 36,0 41,60 34,60"/>
-        <!-- +: 4 right-triangle pieces, right angles at outer corners -->
-        <!-- top-left piece -->
-        <polygon points="48,0 63,0 48,22"/>
-        <!-- top-right piece -->
-        <polygon points="65,0 78,0 78,22"/>
-        <!-- bottom-left piece -->
-        <polygon points="48,38 48,60 63,60"/>
-        <!-- bottom-right piece -->
-        <polygon points="78,38 65,60 78,60"/>
+        <rect x="0" y="0" width="9" height="64"/>
+        <!-- N: left bar + diagonal stroke + right bar -->
+        <rect x="13" y="0" width="8" height="64"/>
+        <polygon points="21,0 29,0 38,64 30,64"/>
+        <rect x="36" y="0" width="8" height="64"/>
+        <!-- +: 4 pentagon pieces, diagonal cuts through center -->
+        <!-- center of + at (62,32), arm width=12, arm extends to edges -->
+        <!-- TOP piece -->
+        <polygon points="56,0 68,0 68,26 62,32 56,26"/>
+        <!-- RIGHT piece -->
+        <polygon points="68,26 82,26 82,38 68,38 62,32"/>
+        <!-- BOTTOM piece -->
+        <polygon points="68,38 62,32 56,38 56,64 68,64"/>
+        <!-- LEFT piece -->
+        <polygon points="48,26 56,26 62,32 56,38 48,38"/>
       </svg>
     </div>
     <span class="glass-topnav-logo-text">INPLUS</span>
