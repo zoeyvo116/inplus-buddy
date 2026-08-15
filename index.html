@@ -5599,7 +5599,7 @@ function renderTracking(){
     const hoClick = `if(HO._hoMode){HO.toggleCard(this,'${trackingId}','${(t.question||'').replace(/'/g,'').replace(/`/g,'').substring(0,40)}','${t.channel||''}','${(t.customerEmail||t.iccid||'').substring(0,30)}');}`;
     return `
     <div class="track-card ${statusCls} ${isHandoff ? 'handoff-card' : ''}" style="${isOverdue?'border-color:rgba(231,76,60,.6);background:rgba(231,76,60,.05)':''}" onclick="${hoClick}">
-      ${isHandoff ? '<div class="handoff-badge">🔖 引継ぎ</div>' : ''}
+      ${isHandoff ? `<div class="handoff-badge">🔖 引継ぎ <span onclick="event.stopPropagation();HO.dismissBadge('${trackingId}')" style="margin-left:4px;opacity:.7;cursor:pointer;font-size:10px">✕</span></div>` : ''}
       <div class="track-header">
         <div class="ho-checkbox">✓</div>
         <span style="width:8px;height:8px;border-radius:50%;background:${statusColor};flex-shrink:0;display:inline-block"></span>
@@ -7571,12 +7571,19 @@ const HO = {
       if (!handoff || !handoff.saved_at) return;
       const age = Date.now() - new Date(handoff.saved_at).getTime();
       if (age > this.BANNER_TTL) return;
-      // Build _handoffCaseIds from ALL recent handoffs, not just the latest
+      // Build _handoffCaseIds from recent handoffs within TTL, minus dismissed
       this._currentHandoff = handoff;
       try {
         const listRes = await fetch(API_URL + '?action=getHandoffList');
         const list = await listRes.json();
-        this._handoffCaseIds = new Set(list.flatMap(h => (h.notes||[]).filter(n=>n.note).map(n=>n.case_id)));
+        const dismissed = this._getDismissed();
+        this._handoffCaseIds = new Set(
+          list.filter(h => {
+            if (!h.saved_at) return false;
+            return (Date.now() - new Date(h.saved_at).getTime()) <= this.BANNER_TTL;
+          }).flatMap(h => (h.notes||[]).filter(n=>n.note).map(n=>n.case_id))
+            .filter(id => !dismissed.has(id))
+        );
       } catch(e) {
         this._handoffCaseIds = new Set((handoff.notes||[]).filter(n=>n.note).map(n=>n.case_id));
       }
@@ -7596,8 +7603,13 @@ const HO = {
 
   async confirmRead() {
     const myStaff = CM.staff ? CM.staff() : localStorage.getItem('inplus_staff_name') || '';
-    if (this._currentHandoffId && myStaff) {
-      await fetch(API_URL + '?action=markHandoffRead&id=' + encodeURIComponent(this._currentHandoffId) + '&staff=' + encodeURIComponent(myStaff));
+    // Mark all currently shown handoffs as read
+    if (myStaff && this._bannerHandoffs) {
+      for (const h of this._bannerHandoffs) {
+        if (h.id) fetch(API_URL + '?action=markHandoffRead&id=' + encodeURIComponent(h.id) + '&staff=' + encodeURIComponent(myStaff));
+      }
+    } else if (this._currentHandoffId && myStaff) {
+      fetch(API_URL + '?action=markHandoffRead&id=' + encodeURIComponent(this._currentHandoffId) + '&staff=' + encodeURIComponent(myStaff));
     }
     this.closeBanner();
     showToast('✅ 引継ぎを確認しました！');
@@ -7716,6 +7728,7 @@ const HO = {
       if (recent.length) allHandoffs = recent;
     } catch(e) {}
 
+    this._bannerHandoffs = allHandoffs;
     this._bannerNotes = {};
     allHandoffs.forEach(h => (h.notes||[]).filter(n=>n.note).forEach(n => { this._bannerNotes[n.case_id] = n; }));
 
@@ -7746,6 +7759,18 @@ const HO = {
   closeBanner() {
     const banner = document.getElementById('handoff-banner');
     if (banner) banner.style.display = 'none';
+  },
+
+  _getDismissed() {
+    try { return new Set(JSON.parse(localStorage.getItem('inplus_dismissed_badges') || '[]')); } catch(e) { return new Set(); }
+  },
+
+  dismissBadge(caseId) {
+    const dismissed = this._getDismissed();
+    dismissed.add(caseId);
+    localStorage.setItem('inplus_dismissed_badges', JSON.stringify([...dismissed]));
+    this._handoffCaseIds && this._handoffCaseIds.delete(caseId);
+    renderTracking && renderTracking();
   },
 
   _openCase(caseId) {
