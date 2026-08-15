@@ -422,10 +422,11 @@ body{
 .glass-sidebar-icon.on{background:#fff;color:#DB0074;box-shadow:none}
 .glass-sidebar-icon.on svg{color:#DB0074}
 .glass-sidebar-sep{width:30px;height:1px;background:rgba(255,255,255,.15);margin:6px 0}
-/* Content area — cream white, fully rounded */
+/* Content area — glassmorphism, fully rounded */
 .glass-content{
   flex:1;overflow:auto;padding:24px 26px;min-width:0;
-  background:#FAF7F3;
+  background:linear-gradient(135deg, rgba(200,230,245,0.7) 0%, rgba(220,232,247,0.7) 30%, rgba(232,213,240,0.7) 60%, rgba(245,213,232,0.7) 100%);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
   border-radius:24px;
 }
 /* Hide old layout */
@@ -433,25 +434,25 @@ body{
 .sidebar{display:none!important}
 /* Page wrapper */
 .page{padding:0!important}
-/* Cards — clean solid style */
+/* Cards — frosted glass */
 .card{
-  background:var(--bg2)!important;
-  border:1px solid var(--border)!important;
+  background:rgba(255,255,255,0.65)!important;
+  border:1px solid rgba(255,255,255,0.8)!important;
   border-radius:20px!important;
-  box-shadow:0 2px 12px rgba(23,22,26,.05)!important;
-  backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+  box-shadow:0 4px 24px rgba(0,0,0,0.08)!important;
+  backdrop-filter:blur(16px)!important;-webkit-backdrop-filter:blur(16px)!important;
 }
 .tmpl-section,.preview-wrap-box{
-  background:var(--bg2)!important;
-  border:1px solid var(--border)!important;
-  box-shadow:0 2px 12px rgba(23,22,26,.05)!important;
-  backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+  background:rgba(255,255,255,0.65)!important;
+  border:1px solid rgba(255,255,255,0.8)!important;
+  box-shadow:0 4px 24px rgba(0,0,0,0.08)!important;
+  backdrop-filter:blur(16px)!important;-webkit-backdrop-filter:blur(16px)!important;
 }
 /* Search */
-.search-wrap{background:var(--bg3)!important;border-color:var(--border-md)!important;backdrop-filter:none!important}
+.search-wrap{background:rgba(255,255,255,0.7)!important;border-color:rgba(255,255,255,.9)!important;backdrop-filter:blur(10px)!important}
 /* Chips */
-.chip{background:var(--bg3)!important;border-color:transparent!important;color:#75706B!important}
-.chip.on{background:#FBE0EE!important;border-color:var(--accent)!important;border-width:1.5px!important;color:#A3196C!important}
+.chip{background:rgba(255,255,255,0.6)!important;border-color:rgba(255,255,255,.8)!important;color:var(--text2)!important}
+.chip.on{background:rgba(219,0,116,0.12)!important;border-color:rgba(219,0,116,.3)!important;color:#DB0074!important}
 /* Track cards — keep card layout (not table rows) */
 .track-card{background:var(--bg2)!important;border-color:var(--border)!important;backdrop-filter:none!important;display:block!important;grid-template-columns:none!important}
 .track-card::before{display:block!important}
