@@ -360,110 +360,104 @@ select option{background:var(--bg3)}
 .drp-day.drp-empty,.drp-day.drp-disabled{cursor:default;color:var(--text3);opacity:.4}
 .drp-hint{font-size:11px;color:var(--text3);margin-top:8px;text-align:center}
 
-/* ===== GLASSMORPHISM LAYOUT ===== */
+/* ===== V8 DESIGN: DARK FRAME + ROUNDED PANELS ===== */
 body{
-  min-height:100vh;
-  background: linear-gradient(135deg, #c8e6f5 0%, #dce8f7 30%, #e8d5f0 60%, #f5d5e8 100%) !important;
-  background-attachment: fixed !important;
+  display:flex!important;flex-direction:column;height:100vh;overflow:hidden;
+  background:#2E1F2A !important;
 }
-/* App shell: top nav + slim icon sidebar + content */
-.glass-shell{display:flex;flex-direction:column;min-height:100vh}
-/* Top nav */
+.glass-shell{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+/* Top nav — transparent on dark background, white text */
 .glass-topnav{
-  height:58px;display:flex;align-items:center;padding:0 20px;gap:8px;flex-shrink:0;
+  height:62px;display:flex;align-items:center;padding:0 22px;gap:8px;flex-shrink:0;
   position:relative;z-index:300;
-  background:#17161A;
-  box-shadow:0 2px 16px rgba(0,0,0,0.2);
+  background:transparent;
+  box-shadow:none;
 }
-/* curved tail pointing down from center of topnav */
-.glass-topnav::after{
-  content:'';position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);
-  width:100px;height:18px;background:#17161A;
-  clip-path:ellipse(50px 18px at 50% 0%);
-}
-.glass-topnav-logo{display:flex;align-items:center;gap:9px;margin-right:16px;flex-shrink:0}
-.glass-topnav-logo-mark{width:34px;height:34px;border-radius:9px;background:#DB0074;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.glass-topnav-logo-text{font-size:14px;font-weight:800;color:#fff;letter-spacing:.02em}
+.glass-topnav::after{display:none}
+.glass-topnav-logo{display:flex;align-items:center;gap:9px;margin-right:20px;flex-shrink:0}
+.glass-topnav-logo-mark{width:28px;height:28px;border-radius:8px;background:#DB0074;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.glass-topnav-logo-text{font-size:15px;font-weight:700;color:#fff;letter-spacing:.03em}
 /* nav centered */
-.glass-topnav-nav{display:flex;align-items:center;gap:2px;position:absolute;left:50%;transform:translateX(-50%)}
+.glass-topnav-nav{display:flex;align-items:center;gap:4px;position:absolute;left:50%;transform:translateX(-50%)}
 .glass-topnav-item{
-  display:flex;align-items:center;gap:7px;padding:7px 13px;border-radius:10px;
-  cursor:pointer;font-size:13px;font-weight:500;color:rgba(255,255,255,0.5);
+  display:flex;align-items:center;gap:8px;height:38px;padding:0 15px;border-radius:12px;
+  cursor:pointer;font-size:13px;font-weight:500;color:rgba(255,255,255,.62);
   transition:all .15s;white-space:nowrap;border:none;background:transparent;flex-shrink:0;
 }
-.glass-topnav-item:hover{background:rgba(255,255,255,0.1);color:rgba(255,255,255,.85)}
-.glass-topnav-item.on{background:rgba(219,0,116,0.25);color:#fff;font-weight:700}
-.glass-topnav-item svg{opacity:.7;transition:opacity .15s}
+.glass-topnav-item:hover{background:rgba(255,255,255,.09);color:#fff}
+.glass-topnav-item.on{background:#fff;color:#DB0074;font-weight:700}
+.glass-topnav-item svg{flex:none;opacity:.75;transition:opacity .15s}
 .glass-topnav-item:hover svg,.glass-topnav-item.on svg{opacity:1}
-.glass-topnav-right{margin-left:auto;display:flex;align-items:center;gap:6px}
+.glass-topnav-item.on svg{color:#DB0074}
+.glass-topnav-right{margin-left:auto;display:flex;align-items:center;gap:8px}
 .glass-topnav-btn{
   display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:10px;
   cursor:pointer;color:rgba(255,255,255,.5);transition:.15s;background:transparent;border:none;
 }
 .glass-topnav-btn:hover{background:rgba(255,255,255,.1);color:#fff}
-/* staff chip in topnav */
+/* Staff chip */
 .glass-staff-chip{
-  display:flex;align-items:center;gap:7px;padding:6px 12px;border-radius:10px;
-  background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);
-  cursor:pointer;font-size:13px;font-weight:500;color:rgba(255,255,255,.7);transition:.15s;
+  display:flex;align-items:center;gap:9px;height:38px;padding:0 14px;border-radius:12px;
+  background:rgba(255,255,255,.09);border:none;
+  cursor:pointer;font-size:12.5px;font-weight:500;color:#fff;transition:.15s;
 }
-.glass-staff-chip:hover{background:rgba(255,255,255,.18);color:#fff}
-/* Main area: sidebar + content */
-.glass-main{display:flex;flex:1}
-/* Slim icon sidebar */
+.glass-staff-chip:hover{background:rgba(255,255,255,.15);color:#fff}
+/* Main area: gap shows dark background = natural frame */
+.glass-main{
+  display:flex;flex:1;min-height:0;
+  gap:10px;padding:0 10px 10px;
+}
+/* Sidebar — rounded glass panel */
 .glass-sidebar{
-  width:64px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:4px;
-  background:rgba(255,255,255,0.4);
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border-right:1px solid rgba(255,255,255,0.5);
+  width:70px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding:14px 9px;gap:2px;
+  background:rgba(255,255,255,.07);
+  border-radius:22px;
   overflow:visible;
 }
 .glass-sidebar-icon{
-  width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;
-  cursor:pointer;color:rgba(23,22,26,.4);transition:all .15s;position:relative;
+  width:52px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:rgba(255,255,255,.6);transition:all .15s;position:relative;
 }
-.glass-sidebar-icon:hover{background:rgba(255,255,255,.7);color:#17161A}
-.glass-sidebar-icon.on{background:#DB0074;color:#fff;box-shadow:0 4px 14px rgba(219,0,116,.35)}
-.glass-sidebar-icon.on svg{stroke:#fff}
-.glass-sidebar-sep{width:24px;height:1px;background:rgba(23,22,26,.1);margin:6px 0}
-/* Content area */
-.glass-content{flex:1;overflow:auto;padding:24px;min-width:0}
-/* Glass cards */
-.glass-card{
-  background:rgba(255,255,255,0.65);
-  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  border:1px solid rgba(255,255,255,0.8);
-  border-radius:20px;
-  box-shadow:0 4px 24px rgba(0,0,0,0.08);
+.glass-sidebar-icon:hover{background:rgba(255,255,255,.12);color:#fff}
+.glass-sidebar-icon.on{background:#fff;color:#DB0074;box-shadow:none}
+.glass-sidebar-icon.on svg{color:#DB0074}
+.glass-sidebar-sep{width:30px;height:1px;background:rgba(255,255,255,.15);margin:6px 0}
+/* Content area — cream white, fully rounded */
+.glass-content{
+  flex:1;overflow:auto;padding:24px 26px;min-width:0;
+  background:#FAF7F3;
+  border-radius:24px;
 }
-/* Override layout for glass shell */
+/* Hide old layout */
 .layout{display:none!important}
 .sidebar{display:none!important}
-/* Page wrapper inside glass-content */
+/* Page wrapper */
 .page{padding:0!important}
-/* Cards and panels use glass style */
-.card,.tmpl-section,.modal-body,.preview-wrap-box{
-  background:rgba(255,255,255,0.65)!important;
-  backdrop-filter:blur(16px)!important;-webkit-backdrop-filter:blur(16px)!important;
-  border:1px solid rgba(255,255,255,0.8)!important;
-  box-shadow:0 4px 24px rgba(0,0,0,0.08)!important;
+/* Cards — clean solid style */
+.card{
+  background:var(--bg2)!important;
+  border:1px solid var(--border)!important;
+  border-radius:20px!important;
+  box-shadow:0 2px 12px rgba(23,22,26,.05)!important;
+  backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
 }
-/* Search wrap */
-.search-wrap{background:rgba(255,255,255,0.7)!important;border-color:rgba(255,255,255,.9)!important;backdrop-filter:blur(10px)!important}
+.tmpl-section,.preview-wrap-box{
+  background:var(--bg2)!important;
+  border:1px solid var(--border)!important;
+  box-shadow:0 2px 12px rgba(23,22,26,.05)!important;
+  backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+}
+/* Search */
+.search-wrap{background:var(--bg3)!important;border-color:var(--border-md)!important;backdrop-filter:none!important}
 /* Chips */
-.chip{background:rgba(255,255,255,0.6)!important;border-color:rgba(255,255,255,.8)!important}
-.chip.on{background:rgba(219,0,116,0.12)!important;border-color:rgba(219,0,116,.3)!important;color:#DB0074!important}
-/* Track cards */
-.track-card{background:rgba(255,255,255,0.6)!important;border-color:rgba(255,255,255,.8)!important;backdrop-filter:blur(10px)!important}
-.track-card.status-wip{border-color:rgba(219,0,116,.25)!important;background:rgba(219,0,116,.04)!important}
+.chip{background:var(--bg3)!important;border-color:transparent!important;color:#75706B!important}
+.chip.on{background:#FBE0EE!important;border-color:var(--accent)!important;border-width:1.5px!important;color:#A3196C!important}
+/* Track cards — keep card layout (not table rows) */
+.track-card{background:var(--bg2)!important;border-color:var(--border)!important;backdrop-filter:none!important;display:block!important;grid-template-columns:none!important}
+.track-card::before{display:block!important}
+.track-card.status-wip{border-color:var(--accent-bd)!important;background:var(--accent-bg)!important}
 .track-card.status-new{border-color:rgba(192,57,43,.3)!important}
-/* Staff badge in topnav */
-.glass-staff-chip{
-  display:flex;align-items:center;gap:7px;padding:6px 12px;border-radius:10px;
-  background:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.8);
-  cursor:pointer;font-size:13px;font-weight:500;color:#17161A;transition:.15s;
-}
-.glass-staff-chip:hover{background:rgba(255,255,255,.85)}
+#tracking-list{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))!important;gap:14px!important;flex-direction:unset!important}
 /* Per-channel colors: chips */
 [data-ch="amazon"] #ch-chips .chip.on{background:#FFE4D6;color:#B94B1A;border-color:#F9B89A}
 [data-ch="line"] #ch-chips .chip.on{background:#D1FAE5;color:#065F46;border-color:#A7F3D0}
