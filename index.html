@@ -518,7 +518,18 @@ body{
   <!-- Logo: just text, bold -->
   <div class="glass-topnav-logo">
     <div class="glass-topnav-logo-mark">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><text x="2" y="15" font-family="Arial Black, sans-serif" font-weight="900" font-size="14" fill="white">IN+</text></svg>
+      <svg width="22" height="18" viewBox="0 0 62 53" fill="white">
+        <!-- I: vertical bar -->
+        <rect x="0" y="4" width="7" height="45"/>
+        <!-- N: two angular diagonal strokes (no vertical bars) -->
+        <polygon points="11,49 17,49 28,4 22,4"/>
+        <polygon points="26,4 32,4 37,49 31,49"/>
+        <!-- +: 4 separate rectangular pieces with center gap -->
+        <rect x="44" y="4" width="7" height="20"/>
+        <rect x="44" y="29" width="7" height="20"/>
+        <rect x="38" y="24" width="6" height="5"/>
+        <rect x="51" y="24" width="11" height="5"/>
+      </svg>
     </div>
     <span class="glass-topnav-logo-text">INPLUS</span>
   </div>
@@ -534,7 +545,7 @@ body{
   </div>
   <!-- Right: staff chip + action buttons -->
   <div class="glass-topnav-right">
-    <div class="glass-staff-chip" onclick="CM.openStaff()">
+    <div class="glass-staff-chip" onclick="CM.openStaff()" id="staff-indicator">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"></path></svg>
       <span id="staff-indicator-name">（未設定）</span>
     </div>
@@ -581,9 +592,6 @@ body{
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M20 14a3 3 0 01-3 3H9.5L5.5 20V7a3 3 0 013-3H17a3 3 0 013 3z"></path></svg>
   </div>
   <div style="flex:1"></div>
-  <div class="glass-sidebar-icon" onclick="CM.openStaff()" title="スタッフ切替" id="staff-indicator" style="margin-bottom:12px">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"></path></svg>
-  </div>
 </div>
 
 <!-- CONTENT -->
