@@ -383,7 +383,20 @@ select option{background:var(--bg3)}
   <div id="staff-indicator" onclick="CM.openStaff()" style="display:flex;align-items:center;gap:8px;padding:8px 20px;cursor:pointer;color:var(--text2);font-size:12px;transition:.15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text2)'">
     <span style="font-size:14px">👤</span>
     <span id="staff-indicator-name" style="flex:1">（未設定）</span>
-    <span style="font-size:10px;color:var(--text3)">変更</span>
+    <span style="font-size:10px;color:var(--text3)">▾</span>
+  </div>
+  <!-- Staff dropdown -->
+  <div id="cm-staff-dropdown" style="display:none;position:fixed;left:0;width:200px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.4);z-index:3000;overflow:hidden">
+    <div id="cm-staff-list" style="max-height:240px;overflow-y:auto"></div>
+    <div style="border-top:1px solid var(--border)">
+      <div id="cm-staff-add-btn" onclick="CM.showAddStaff()" style="display:flex;align-items:center;gap:8px;padding:10px 14px;cursor:pointer;color:var(--accent);font-size:13px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'">
+        <span style="font-size:16px;font-weight:300;line-height:1">＋</span> 新しく追加
+      </div>
+      <div id="cm-staff-add-input" style="display:none;padding:8px 12px;gap:6px;align-items:center">
+        <input type="text" id="cm-staff-new-name" placeholder="名前を入力" onkeydown="if(event.key==='Enter')CM.addNewStaff()" style="flex:1;padding:6px 8px;border-radius:6px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:12px;outline:none">
+        <button onclick="CM.addNewStaff()" style="padding:6px 10px;border-radius:6px;border:none;background:var(--accent);color:#fff;font-size:11px;cursor:pointer;font-weight:600">追加</button>
+      </div>
+    </div>
   </div>
   <!-- #8 Shift Handoff button -->
   <div id="handoff-btn" class="nav-item" onclick="HO.openHandoff()" style="justify-content:space-between">
@@ -1606,23 +1619,6 @@ select option{background:var(--bg3)}
   </div>
 </div>
 
-<!-- MODAL: Staff名設定 -->
-<div class="cm-modal" id="cm-staff-modal">
-  <div class="cm-box" style="width:340px;padding:0;overflow:hidden">
-    <div class="cm-header" style="padding:16px 20px;margin:0;border-bottom:1px solid var(--border)">👤 スタッフを選択</div>
-    <div id="cm-staff-list" style="max-height:280px;overflow-y:auto"></div>
-    <div style="border-top:1px solid var(--border)">
-      <div id="cm-staff-add-btn" onclick="CM.showAddStaff()" style="display:flex;align-items:center;gap:8px;padding:12px 16px;cursor:pointer;color:var(--accent);font-size:13px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'">
-        <span style="font-size:18px;font-weight:300;line-height:1">＋</span> 新しく追加
-      </div>
-      <div id="cm-staff-add-input" style="display:none;padding:10px 16px;gap:6px;align-items:center">
-        <input type="text" id="cm-staff-new-name" placeholder="名前を入力" onkeydown="if(event.key==='Enter')CM.addNewStaff()" style="flex:1;padding:7px 10px;border-radius:7px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:13px;outline:none">
-        <button onclick="CM.addNewStaff()" style="padding:7px 12px;border-radius:7px;border:none;background:var(--accent);color:#fff;font-size:12px;cursor:pointer;font-weight:600;flex-shrink:0">追加</button>
-        <button onclick="CM.cancelAddStaff()" style="padding:7px 10px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:12px;cursor:pointer;flex-shrink:0">×</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- PAGE: KB -->
 <div class="page" id="page-kb">
@@ -7004,31 +7000,45 @@ const CM = {
   },
 
   async openStaff() {
-    const modal = document.getElementById('cm-staff-modal');
-    modal.classList.add('open');
+    const dropdown = document.getElementById('cm-staff-dropdown');
+    if (!dropdown) return;
+    if (dropdown.style.display !== 'none') { this.closeStaff(); return; }
+    const anchor = document.getElementById('staff-indicator');
+    if (anchor) {
+      const r = anchor.getBoundingClientRect();
+      dropdown.style.top = (r.bottom + 4) + 'px';
+      dropdown.style.left = r.left + 'px';
+    }
+    dropdown.style.display = 'block';
     this.cancelAddStaff();
     const listEl = document.getElementById('cm-staff-list');
-    listEl.innerHTML = '<div style="text-align:center;padding:16px;color:var(--text3);font-size:12px">読み込み中...</div>';
+    listEl.innerHTML = '<div style="text-align:center;padding:12px;color:var(--text3);font-size:11px">読み込み中...</div>';
     const list = await this._loadStaffList();
     const cur = this.staff();
     if (!list.length) {
-      listEl.innerHTML = '<div style="padding:14px 16px;font-size:12px;color:var(--text3)">まだ誰も登録していません。＋ から名前を追加してください。</div>';
+      listEl.innerHTML = '<div style="padding:10px 14px;font-size:11px;color:var(--text3)">まだ誰もいません</div>';
       this.showAddStaff();
       return;
     }
     listEl.innerHTML = list.map(name => `
-      <div onclick="CM.selectStaff('${name.replace(/'/g,"\\'")}')" style="display:flex;align-items:center;gap:10px;padding:11px 16px;cursor:pointer;border-bottom:1px solid var(--border)" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'">
-        <span style="font-size:13px;color:${name===cur?'var(--accent)':'var(--text3)'}">${name===cur?'●':'○'}</span>
-        <span style="font-size:13px;color:${name===cur?'var(--accent)':'var(--text)'};font-weight:${name===cur?'600':'400'}">${name}</span>
-        ${name===cur?'<span style="font-size:10px;color:var(--accent);margin-left:auto">現在</span>':''}
+      <div onclick="CM.selectStaff('${name.replace(/'/g,"\\'")}')" style="display:flex;align-items:center;gap:8px;padding:9px 14px;cursor:pointer;border-bottom:1px solid var(--border)" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'">
+        <span style="font-size:12px;color:${name===cur?'var(--accent)':'var(--text3)'}">${name===cur?'●':'○'}</span>
+        <span style="font-size:12px;color:${name===cur?'var(--accent)':'var(--text)'};font-weight:${name===cur?'600':'400'}">${name}</span>
+        ${name===cur?'<span style="font-size:10px;color:var(--accent);margin-left:auto">✓</span>':''}
       </div>`).join('');
+  },
+
+  closeStaff() {
+    const d = document.getElementById('cm-staff-dropdown');
+    if (d) d.style.display = 'none';
+    this.cancelAddStaff();
   },
 
   selectStaff(name) {
     localStorage.setItem('inplus_staff_name', name);
     const ind = document.getElementById('staff-indicator-name');
     if (ind) ind.textContent = name;
-    document.getElementById('cm-staff-modal').classList.remove('open');
+    this.closeStaff();
     this.renderBar();
     showToast(`👤 ${name} でログイン`);
   },
@@ -8387,8 +8397,15 @@ setTimeout(() => { HO.checkBanner(); HO.startAutoCheck(); }, 1200);
 document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
   if (HO._hoMode) { HO.exitHandoffMode(); return; }
+  CM.closeStaff();
   const open = document.querySelector('.cm-modal.open');
   if (open) { open.dispatchEvent(new MouseEvent('click', {bubbles:true})); open.classList.remove('open'); }
+});
+// Click outside closes staff dropdown
+document.addEventListener('click', e => {
+  const dd = document.getElementById('cm-staff-dropdown');
+  const anchor = document.getElementById('staff-indicator');
+  if (dd && dd.style.display !== 'none' && !dd.contains(e.target) && !anchor.contains(e.target)) CM.closeStaff();
 });
 // Init staff indicator
 (()=>{
