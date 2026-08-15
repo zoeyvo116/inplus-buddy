@@ -390,6 +390,7 @@ select option{background:var(--bg3)}
     <span style="display:flex;align-items:center;gap:8px"><span class="nav-icon">📝</span>引継ぎメモ</span>
     <span style="display:flex;align-items:center;gap:6px">
       <span id="handoff-pending-dot" style="display:none;width:7px;height:7px;border-radius:50%;background:var(--warning)"></span>
+      <span onclick="event.stopPropagation();HO.checkBanner()" style="font-size:10px;padding:1px 6px;border-radius:4px;border:1px solid var(--border);color:var(--text3);cursor:pointer" title="引継ぎを今すぐ確認">🔄</span>
       <span onclick="event.stopPropagation();HO.openHistory()" style="font-size:10px;padding:1px 6px;border-radius:4px;border:1px solid var(--border);color:var(--text3);cursor:pointer" title="引継ぎ履歴">履歴</span>
     </span>
   </div>
@@ -1437,7 +1438,6 @@ select option{background:var(--bg3)}
     <div id="handoff-banner-list" style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px"></div>
     <div id="handoff-banner-readby" style="font-size:11px;color:rgba(46,204,113,.6);margin-bottom:12px"></div>
     <div style="display:flex;justify-content:flex-end;gap:8px">
-      <button onclick="HO.closeBanner()" style="font-size:12px;padding:6px 16px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer">後で見る</button>
       <button onclick="HO.confirmRead()" style="font-size:12px;padding:6px 16px;background:rgba(46,204,113,.2);border:1px solid rgba(46,204,113,.6);border-radius:8px;color:#2ecc71;cursor:pointer;font-weight:600">✅ 確認しました</button>
     </div>
   </div>
@@ -1465,10 +1465,15 @@ select option{background:var(--bg3)}
         </div>
       </div>
       <div id="handoff-tab-history" style="display:none">
-        <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:6px;flex-wrap:wrap">
+          <div style="display:flex;gap:4px;flex-wrap:wrap">
+            <button id="ho-filter-all"    onclick="HO.setFilter('all')"         style="font-size:11px;padding:2px 10px;border-radius:6px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer">全て</button>
+            <button id="ho-filter-unread" onclick="HO.setFilter('unread')"      style="font-size:11px;padding:2px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer">未確認</button>
+            <button id="ho-filter-active" onclick="HO.setFilter('active')"      style="font-size:11px;padding:2px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer">対応中</button>
+          </div>
           <button onclick="HO.deleteAllHandoff()" style="font-size:11px;padding:3px 10px;border-radius:6px;border:1px solid var(--danger);color:var(--danger);background:transparent;cursor:pointer">🗑 全て削除</button>
         </div>
-        <div id="handoff-history-list" style="max-height:380px;overflow-y:auto"></div>
+        <div id="handoff-history-list" style="max-height:360px;overflow-y:auto"></div>
       </div>
     </div>
   </div>
@@ -1603,17 +1608,18 @@ select option{background:var(--bg3)}
 
 <!-- MODAL: Staff名設定 -->
 <div class="cm-modal" id="cm-staff-modal">
-  <div class="cm-box" style="width:360px">
-    <div class="cm-header">👤 スタッフ名を設定</div>
-    <div class="cm-body">
-      <div class="row">
-        <label class="label">あなたの名前</label>
-        <input type="text" id="cm-staff-name" placeholder="例：Zoey" autofocus>
+  <div class="cm-box" style="width:340px;padding:0;overflow:hidden">
+    <div class="cm-header" style="padding:16px 20px;margin:0;border-bottom:1px solid var(--border)">👤 スタッフを選択</div>
+    <div id="cm-staff-list" style="max-height:280px;overflow-y:auto"></div>
+    <div style="border-top:1px solid var(--border)">
+      <div id="cm-staff-add-btn" onclick="CM.showAddStaff()" style="display:flex;align-items:center;gap:8px;padding:12px 16px;cursor:pointer;color:var(--accent);font-size:13px" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'">
+        <span style="font-size:18px;font-weight:300;line-height:1">＋</span> 新しく追加
       </div>
-      <div style="font-size:12px;color:var(--text3)">Caseログに記録されます。後からでも変更できます。</div>
-    </div>
-    <div class="cm-footer">
-      <button class="btn btn-primary" style="width:100%" onclick="CM.saveStaff()">保存して開始</button>
+      <div id="cm-staff-add-input" style="display:none;padding:10px 16px;gap:6px;align-items:center">
+        <input type="text" id="cm-staff-new-name" placeholder="名前を入力" onkeydown="if(event.key==='Enter')CM.addNewStaff()" style="flex:1;padding:7px 10px;border-radius:7px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:13px;outline:none">
+        <button onclick="CM.addNewStaff()" style="padding:7px 12px;border-radius:7px;border:none;background:var(--accent);color:#fff;font-size:12px;cursor:pointer;font-weight:600;flex-shrink:0">追加</button>
+        <button onclick="CM.cancelAddStaff()" style="padding:7px 10px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:12px;cursor:pointer;flex-shrink:0">×</button>
+      </div>
     </div>
   </div>
 </div>
@@ -6970,22 +6976,94 @@ const CM = {
   },
 
   // ── Staff modal ──
-  openStaff(){
-    const cur=this.staff();
-    const inp=document.getElementById('cm-staff-name');
-    if(inp && cur) inp.value=cur;
-    document.getElementById('cm-staff-modal').classList.add('open');
+  _staffCache: null,
+
+  async _loadStaffList() {
+    // 1. Try localStorage cache
+    try { this._staffCache = JSON.parse(localStorage.getItem('inplus_staff_list') || 'null'); } catch(e) {}
+    // 2. Fetch from server (merge with handoff history names as fallback)
+    try {
+      const res = await fetch(API_URL + '?action=getStaffList');
+      const data = await res.json();
+      if (Array.isArray(data) && data.length) {
+        this._staffCache = data;
+        localStorage.setItem('inplus_staff_list', JSON.stringify(data));
+        return this._staffCache;
+      }
+    } catch(e) {}
+    // 3. Fallback: extract names from handoff history
+    if (!this._staffCache || !this._staffCache.length) {
+      try {
+        const res2 = await fetch(API_URL + '?action=getHandoffList');
+        const list = await res2.json();
+        const names = [...new Set(list.map(h => h.staff).filter(Boolean))];
+        if (names.length) { this._staffCache = names; localStorage.setItem('inplus_staff_list', JSON.stringify(names)); }
+      } catch(e) {}
+    }
+    return this._staffCache || [];
   },
-  saveStaff(){
-    const n=document.getElementById('cm-staff-name').value.trim();
-    if(!n){showToast('⚠️ 名前を入力してください');return;}
-    localStorage.setItem('inplus_staff_name',n);
-    const ind=document.getElementById('staff-indicator-name');
-    if(ind) ind.textContent=n;
+
+  async openStaff() {
+    const modal = document.getElementById('cm-staff-modal');
+    modal.classList.add('open');
+    this.cancelAddStaff();
+    const listEl = document.getElementById('cm-staff-list');
+    listEl.innerHTML = '<div style="text-align:center;padding:16px;color:var(--text3);font-size:12px">読み込み中...</div>';
+    const list = await this._loadStaffList();
+    const cur = this.staff();
+    if (!list.length) {
+      listEl.innerHTML = '<div style="padding:14px 16px;font-size:12px;color:var(--text3)">まだ誰も登録していません。＋ から名前を追加してください。</div>';
+      this.showAddStaff();
+      return;
+    }
+    listEl.innerHTML = list.map(name => `
+      <div onclick="CM.selectStaff('${name.replace(/'/g,"\\'")}')" style="display:flex;align-items:center;gap:10px;padding:11px 16px;cursor:pointer;border-bottom:1px solid var(--border)" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='transparent'">
+        <span style="font-size:13px;color:${name===cur?'var(--accent)':'var(--text3)'}">${name===cur?'●':'○'}</span>
+        <span style="font-size:13px;color:${name===cur?'var(--accent)':'var(--text)'};font-weight:${name===cur?'600':'400'}">${name}</span>
+        ${name===cur?'<span style="font-size:10px;color:var(--accent);margin-left:auto">現在</span>':''}
+      </div>`).join('');
+  },
+
+  selectStaff(name) {
+    localStorage.setItem('inplus_staff_name', name);
+    const ind = document.getElementById('staff-indicator-name');
+    if (ind) ind.textContent = name;
     document.getElementById('cm-staff-modal').classList.remove('open');
     this.renderBar();
-    showToast(`👤 ${n} でログイン`);
+    showToast(`👤 ${name} でログイン`);
   },
+
+  showAddStaff() {
+    document.getElementById('cm-staff-add-btn').style.display = 'none';
+    const row = document.getElementById('cm-staff-add-input');
+    row.style.display = 'flex';
+    setTimeout(() => document.getElementById('cm-staff-new-name')?.focus(), 50);
+  },
+
+  cancelAddStaff() {
+    const btn = document.getElementById('cm-staff-add-btn');
+    const inp = document.getElementById('cm-staff-add-input');
+    if (btn) btn.style.display = '';
+    if (inp) inp.style.display = 'none';
+    const el = document.getElementById('cm-staff-new-name');
+    if (el) el.value = '';
+  },
+
+  async addNewStaff() {
+    const el = document.getElementById('cm-staff-new-name');
+    const name = el?.value.trim();
+    if (!name) { showToast('⚠️ 名前を入力してください'); return; }
+    const list = await this._loadStaffList();
+    if (!list.includes(name)) {
+      list.push(name);
+      this._staffCache = list;
+      localStorage.setItem('inplus_staff_list', JSON.stringify(list));
+      try { await fetch(API_URL + '?action=addStaff&name=' + encodeURIComponent(name)); } catch(e) {}
+    }
+    this.selectStaff(name);
+  },
+
+  saveStaff() { /* legacy - kept for safety */ },
 
   // ── GAS API (async, non-blocking) ──
   gasPost(action, body){
@@ -7459,7 +7537,7 @@ const CH = {
 // ═══════════════════════════════════════════
 const HO = {
   KEY: 'inplus_last_handoff',
-  BANNER_TTL: 16 * 60 * 60 * 1000, // 16 hours
+  BANNER_TTL: 24 * 60 * 60 * 1000, // 24 hours
 
   openHandoff() {
     // Toggle handoff mode
@@ -7549,6 +7627,10 @@ const HO = {
       channel: c.channel || '',
       note: document.getElementById(`ho-note-${i}`)?.value.trim() || ''
     }));
+    if (!notes.some(n => n.note)) {
+      showToast('⚠️ 少なくとも1件メモを入力してください');
+      return;
+    }
     const handoff = {
       staff: CM.staff ? CM.staff() : localStorage.getItem('inplus_staff_name') || 'Staff',
       saved_at: new Date().toISOString(),
@@ -7556,12 +7638,17 @@ const HO = {
     };
     document.getElementById('ho-note-modal').classList.remove('open');
     this.exitHandoffMode();
-    showToast('📝 引継ぎメモを保存しました！');
     document.getElementById('handoff-pending-dot').style.display = 'none';
     // Flash handoff cases in tracking list
     this._handoffCaseIds = new Set(notes.filter(n => n.note).map(n => n.case_id));
     renderTracking();
-    await fetch(API_URL + '?action=saveHandoff&staff=' + encodeURIComponent(handoff.staff) + '&saved_at=' + encodeURIComponent(handoff.saved_at) + '&notes=' + encodeURIComponent(JSON.stringify(handoff.notes)));
+    try {
+      const res = await fetch(API_URL + '?action=saveHandoff&staff=' + encodeURIComponent(handoff.staff) + '&saved_at=' + encodeURIComponent(handoff.saved_at) + '&notes=' + encodeURIComponent(JSON.stringify(handoff.notes)));
+      if (!res.ok) throw new Error('server error');
+      showToast('📝 引継ぎメモを保存しました！');
+    } catch(e) {
+      showToast('⚠️ 保存に失敗しました。ネットワークを確認してください。');
+    }
   },
 
   async checkBanner() {
@@ -7589,7 +7676,7 @@ const HO = {
       }
       renderTracking && renderTracking();
       const myStaff = CM.staff ? CM.staff() : '';
-      if (handoff.staff === myStaff && age < 60000) return;
+      if (handoff.staff === myStaff) return; // 自分が作った引継ぎは表示しない
       const readBy = handoff.read_by || [];
       if (myStaff && readBy.includes(myStaff)) return;
       this._showBanner(handoff);
@@ -7598,7 +7685,7 @@ const HO = {
 
   startAutoCheck() {
     if (this._checkInterval) return;
-    this._checkInterval = setInterval(() => this.checkBanner(), 5 * 60 * 1000);
+    this._checkInterval = setInterval(() => this.checkBanner(), 60 * 1000); // 1 minute
   },
 
   async confirmRead() {
@@ -7625,23 +7712,56 @@ const HO = {
     if (tab === 'history') this.loadHistory();
   },
 
-  async loadHistory() {
+  setFilter(f) {
+    this._historyFilter = f;
+    ['all','unread','active'].forEach(k => {
+      const btn = document.getElementById(`ho-filter-${k}`);
+      if (!btn) return;
+      const active = k === f;
+      btn.style.background = active ? 'var(--accent)' : 'transparent';
+      btn.style.color = active ? '#fff' : 'var(--text2)';
+      btn.style.borderColor = active ? 'var(--accent)' : 'var(--border)';
+    });
+    this.loadHistory(0);
+  },
+
+  async loadHistory(page) {
+    this._historyPage = page || 0;
+    this._historyFilter = this._historyFilter || 'all';
+    const PAGE_SIZE = 20;
+    const OVERDUE_MS = 2 * 60 * 60 * 1000; // 2 hours
     const el = document.getElementById('handoff-history-list');
     el.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text3)">読み込み中...</div>`;
     try {
       const res = await fetch(API_URL + '?action=getHandoffList');
-      const list = await res.json();
-      if (!list.length) { el.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text3)">履歴なし</div>`; return; }
-      // Build set of resolved case IDs from SHEET_TRACKING
+      const rawList = await res.json();
       const resolvedIds = new Set((SHEET_TRACKING||[]).filter(t=>t.status==='完了'||t.status==='対応不要').map(t=>`tracking-${t.row}`));
+      const myStaff = CM.staff ? CM.staff() : localStorage.getItem('inplus_staff_name') || '';
+
+      // Apply filter
+      const allList = rawList.filter(h => {
+        if (this._historyFilter === 'unread') return !(h.read_by||[]).length;
+        if (this._historyFilter === 'active') return (h.notes||[]).some(n => n.note && !resolvedIds.has(n.case_id));
+        return true;
+      });
+
+      if (!allList.length) { el.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text3)">該当なし</div>`; return; }
+      const totalPages = Math.ceil(allList.length / PAGE_SIZE);
+      const p = Math.min(this._historyPage, totalPages - 1);
+      const list = allList.slice(p * PAGE_SIZE, (p + 1) * PAGE_SIZE);
       el.innerHTML = list.map(h => {
         const t = new Date(h.saved_at);
         const dateStr = `${t.getMonth()+1}/${t.getDate()} ${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}`;
         const readBy = (h.read_by || []).join(', ');
         const notes = (h.notes || []).filter(n => n.note);
-        return `<div data-handoff-id="${h.id}" style="border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px;background:var(--bg3)">
+        const isUnread = !(h.read_by||[]).length;
+        const age = Date.now() - new Date(h.saved_at).getTime();
+        const isOverdue = isUnread && age > OVERDUE_MS;
+        const cardBorder = isOverdue ? '1px solid rgba(231,76,60,.5)' : '1px solid var(--border)';
+        const cardBg = isOverdue ? 'rgba(231,76,60,.05)' : 'var(--bg3)';
+        return `<div data-handoff-id="${h.id}" style="border:${cardBorder};border-radius:8px;padding:12px;margin-bottom:8px;background:${cardBg}">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-            <span style="font-weight:600;color:var(--accent)">${h.staff} <span style="font-size:11px;color:var(--text3);font-weight:400">${dateStr}</span></span>
+            <span style="font-weight:600;color:var(--accent)">${h.staff} <span style="font-size:11px;color:var(--text3);font-weight:400">${dateStr}</span>${isOverdue ? ' <span style="font-size:10px;color:#e74c3c;font-weight:700">⚠️ 2時間以上未確認</span>' : ''}</span>
             <button onclick="HO.deleteHandoff('${h.id}')" style="font-size:11px;padding:2px 8px;border-radius:6px;border:1px solid var(--danger);color:var(--danger);background:transparent;cursor:pointer">🗑 削除</button>
           </div>
           ${notes.length ? notes.map(n => {
@@ -7656,9 +7776,17 @@ const HO = {
               ${!isDone ? `<button onclick="HO.carryOver('${n.case_id}','${(n.customer_name||'').replace(/'/g,'')}','${n.channel||''}')" style="margin-top:4px;font-size:10px;padding:1px 8px;border-radius:4px;border:1px solid rgba(46,204,113,.4);color:#2ecc71;background:transparent;cursor:pointer">➕ 引継ぎに追加</button>` : ''}
             </div>`;
           }).join('') : `<div style="font-size:12px;color:var(--text3);font-style:italic">メモなし</div>`}
-          ${readBy ? `<div style="font-size:11px;color:rgba(46,204,113,.6);margin-top:6px">✅ 確認済: ${readBy}</div>` : ''}
+          ${readBy ? `<div style="font-size:11px;color:rgba(46,204,113,.6);margin-top:6px">✅ 確認済: ${readBy}</div>` : `<div style="font-size:11px;color:var(--text3);margin-top:6px">未確認</div>`}
         </div>`;
       }).join('');
+      // Pagination controls
+      if (totalPages > 1) {
+        el.innerHTML += `<div style="display:flex;justify-content:center;align-items:center;gap:12px;margin-top:12px;font-size:12px;color:var(--text3)">
+          <button onclick="HO.loadHistory(${p-1})" ${p===0?'disabled':''} style="padding:3px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer;${p===0?'opacity:.4;cursor:default':''}">← 前</button>
+          <span>${p+1} / ${totalPages}</span>
+          <button onclick="HO.loadHistory(${p+1})" ${p>=totalPages-1?'disabled':''} style="padding:3px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer;${p>=totalPages-1?'opacity:.4;cursor:default':''}">次 →</button>
+        </div>`;
+      }
     } catch(e) { el.innerHTML = `<div style="text-align:center;padding:20px;color:var(--danger)">読み込みエラー</div>`; }
   },
 
@@ -7692,13 +7820,13 @@ const HO = {
     document.getElementById('handoff-modal').classList.remove('open');
     this.openHandoff();
     setTimeout(() => {
-      // Find and pre-select the card
       const cards = document.querySelectorAll('.track-card');
+      let found = false;
       cards.forEach(card => {
-        if (card.getAttribute('onclick') && card.getAttribute('onclick').includes(caseId)) {
-          card.click();
-        }
+        const oc = card.getAttribute('onclick') || '';
+        if (oc.includes(caseId)) { card.click(); found = true; }
       });
+      if (!found) showToast(`⚠️ "${label || caseId}" が見つかりません。フィルターを確認してください。`);
     }, 300);
   },
 
@@ -7759,6 +7887,9 @@ const HO = {
   closeBanner() {
     const banner = document.getElementById('handoff-banner');
     if (banner) banner.style.display = 'none';
+    // Show orange dot if closed without confirming
+    const dot = document.getElementById('handoff-pending-dot');
+    if (dot && this._bannerHandoffs && this._bannerHandoffs.length) dot.style.display = '';
   },
 
   _getDismissed() {
