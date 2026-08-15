@@ -7708,7 +7708,10 @@ const HO = {
       const recent = list.filter(h => {
         if (!h.saved_at) return false;
         const age = Date.now() - new Date(h.saved_at).getTime();
-        return age <= this.BANNER_TTL;
+        if (age > this.BANNER_TTL) return false;
+        if (h.staff === myStaff) return false; // 自分のは除外
+        if (myStaff && (h.read_by||[]).includes(myStaff)) return false; // 確認済みは除外
+        return true;
       });
       if (recent.length) allHandoffs = recent;
     } catch(e) {}
