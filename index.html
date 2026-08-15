@@ -365,19 +365,9 @@ body{
   min-height:100vh;
   background: linear-gradient(135deg, #c8e6f5 0%, #dce8f7 30%, #e8d5f0 60%, #f5d5e8 100%) !important;
   background-attachment: fixed !important;
-  display:flex;align-items:center;justify-content:center;padding:16px;
-}
-/* Outer frame — rounded border wrapping the whole app */
-.glass-frame{
-  width:100%;max-width:1440px;height:calc(100vh - 32px);
-  border-radius:28px;
-  border:2px solid #17161A;
-  overflow:hidden;
-  display:flex;flex-direction:column;
-  box-shadow:0 8px 40px rgba(0,0,0,0.18);
 }
 /* App shell: top nav + slim icon sidebar + content */
-.glass-shell{display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden}
+.glass-shell{display:flex;flex-direction:column;min-height:100vh}
 /* Top nav */
 .glass-topnav{
   height:58px;display:flex;align-items:center;padding:0 20px;gap:8px;flex-shrink:0;
@@ -527,7 +517,6 @@ body{
 <body>
 <div id="loading-banner" style="position:fixed;top:0;left:0;right:0;z-index:9999;background:#DB0074;color:#fff;text-align:center;padding:8px;font-size:13px;font-family:var(--font)">データを読み込み中...</div>
 
-<div class="glass-frame">
 <div class="glass-shell">
 
 <!-- TOP NAV -->
@@ -1887,7 +1876,6 @@ body{
 </div><!-- /glass-content -->
 </div><!-- /glass-main -->
 </div><!-- /glass-shell -->
-</div><!-- /glass-frame -->
 <div class="toast" id="toast"></div>
 
 <!-- BOTTOM NAV (mobile only) -->
