@@ -7,26 +7,26 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  /* Option O: Warm cream body + black topbar + per-channel colors */
-  --bg: #F7F4EF;
+  /* 1c Soft pastel design system */
+  --bg: #FAF7F3;
   --bg2: #FFFFFF;
-  --bg3: #F0ECE5;
-  --border: #E8E2D8;
-  --border-md: #D9D2C8;
-  --accent: #1C1917;
-  --accent2: #44403C;
-  --accent-bg: #F0ECE5;
-  --accent-bd: #D9D2C8;
-  --success: #166534;
-  --success-bg: #DCFCE7;
-  --warning: #92400E;
-  --warning-bg: #FEF3C7;
-  --danger: #991B1B;
-  --danger-bg: #FEE2E2;
-  --text: #1C1917;
-  --text2: #78716C;
-  --text3: #A8A29E;
-  --radius: 18px;
+  --bg3: #F7F5F2;
+  --border: #ECEAEF;
+  --border-md: #D8D5DE;
+  --accent: #DB0074;
+  --accent2: #A8005A;
+  --accent-bg: #FDEBF4;
+  --accent-bd: #F7C9E0;
+  --success: #1F8A5B;
+  --success-bg: #E8F8F1;
+  --warning: #B4741C;
+  --warning-bg: #FEF3E7;
+  --danger: #C0392B;
+  --danger-bg: #FDECEA;
+  --text: #17161A;
+  --text2: #6E6B76;
+  --text3: #A8A5B0;
+  --radius: 20px;
   --font: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif;
 }
 :root.dark {
@@ -78,7 +78,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 .page-sub{font-size:12px;color:var(--text2);margin-bottom:20px}
 
 /* CARDS */
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:24px;padding:18px;margin-bottom:12px;box-shadow:0 2px 12px rgba(23,22,26,.05)}
 .card-title{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
 
 /* FORM */
@@ -93,7 +93,7 @@ select option{background:var(--bg3)}
 
 /* CHIPS */
 .chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px}
-.chip{font-size:11px;padding:5px 12px;border-radius:99px;border:1px solid var(--border-md);background:var(--bg2);color:var(--text2);cursor:pointer;font-family:var(--font);transition:.15s}
+.chip{font-size:13px;padding:9px 16px;border-radius:99px;border:1px solid var(--border-md);background:var(--bg2);color:var(--text2);cursor:pointer;font-family:var(--font);transition:.15s;font-weight:500}
 .chip:hover{border-color:var(--accent);color:var(--accent)}
 .chip.on{background:var(--accent-bg);color:var(--accent);border-color:var(--accent-bd);font-weight:600}
 .chip.warn.on{background:var(--warning-bg);color:var(--warning);border-color:var(--warning)}
@@ -372,20 +372,20 @@ body{display:flex!important;flex-direction:column;min-height:100vh}
 .app-topbar-logo .logo-text .plus{font-weight:800}
 .atn{font-size:11px;font-weight:500;color:#777;padding:5px 11px;border-radius:99px;cursor:pointer;transition:.15s;white-space:nowrap;user-select:none}
 .atn:hover{color:#fff;background:rgba(255,255,255,.1)}
-.atn.on{color:#fff;background:#333;font-weight:600}
+.atn.on{color:#fff;background:#DB0074;font-weight:600}
 .app-topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px}
 .tb-staff{font-size:11px;color:#777;cursor:pointer;display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:99px;transition:.15s}
 .tb-staff:hover{color:#fff;background:rgba(255,255,255,.1)}
 /* Navy sidebar – icon + label, cream pill active, natural icons */
-body{background:#F7F4EF!important}
-.sidebar{background:#1B2460!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;border-right:none!important;padding:12px 8px!important;overflow:hidden!important;width:96px!important}
+body{background:#FAF7F3!important}
+.sidebar{background:#17161A!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;border-right:none!important;padding:12px 8px!important;overflow:hidden!important;width:96px!important}
 .layout{grid-template-columns:96px 1fr!important}
 .sidebar .logo,.sidebar .nav-section,.sidebar .theme-toggle{display:none!important}
 .sidebar .nav-item{font-size:9px!important;font-weight:500!important;flex-direction:column!important;align-items:center!important;text-align:center!important;padding:10px 4px!important;justify-content:center!important;margin:2px 0!important;border-radius:16px!important;color:rgba(255,255,255,.45)!important;background:transparent!important;line-height:1.3!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;transition:all .15s!important}
 .sidebar .nav-item .nav-icon{font-size:22px!important;width:auto!important;filter:none!important;opacity:.65!important;display:block!important;margin-bottom:4px!important;transition:opacity .15s!important}
 .sidebar .nav-item:hover{background:rgba(255,255,255,.07)!important;color:rgba(255,255,255,.75)!important}
 .sidebar .nav-item:hover .nav-icon{opacity:.85!important}
-.sidebar .nav-item.on{background:rgba(245,240,232,.96)!important;color:#1B2460!important;font-weight:700!important}
+.sidebar .nav-item.on{background:rgba(219,0,116,.15)!important;color:#DB0074!important;font-weight:700!important}
 .sidebar .nav-item.on .nav-icon{opacity:1!important}
 #staff-indicator{flex-direction:column!important;align-items:center!important;text-align:center!important;padding:10px 4px!important;margin:2px 0!important;font-size:9px!important;color:rgba(255,255,255,.45)!important;justify-content:center!important;gap:0!important}
 #staff-indicator>span:first-child{font-size:22px!important;filter:none!important;opacity:.65!important;display:block!important;margin-bottom:4px!important}
@@ -410,10 +410,52 @@ body{background:#F7F4EF!important}
 [data-ch="rakuten"] .tmpl-preview-wrap .preview-out{background:#FFF5F5!important;border-color:#FCA5A5!important}
 [data-ch="shopify"] .tmpl-preview-wrap .preview-out{background:#ECFDF5!important;border-color:#6EE7B7!important}
 /* Card: soft shadow instead of hard border */
-.card{box-shadow:0 2px 8px rgba(0,0,0,.06)!important;border-color:transparent!important}
+.card{box-shadow:0 2px 12px rgba(23,22,26,.05)!important;border-color:var(--border)!important}
 /* nav-item default for icon mode */
 .sidebar .nav-item:hover{color:var(--text2)!important}
-.sidebar .nav-item.on{color:#fff!important}
+.sidebar .nav-item.on{color:#DB0074!important}
+/* Tracking table row style (1d) */
+#tracking-list{display:flex!important;flex-direction:column!important;gap:0!important}
+.track-card{background:var(--bg2)!important;border:none!important;border-bottom:1px solid var(--bg3)!important;border-radius:0!important;padding:0!important;margin-top:0!important;display:grid!important;grid-template-columns:110px 1fr 120px 120px 110px!important;gap:12px!important;align-items:center!important;transition:.15s!important;cursor:pointer}
+.track-card::before{display:none!important}
+.track-card:hover{background:var(--bg3)!important;border-color:var(--border)!important;box-shadow:none!important}
+.track-card:last-child{border-bottom:none!important}
+.track-card.status-done{opacity:.55!important}
+.track-card.status-wip{border-left:3px solid var(--accent)!important;background:rgba(219,0,116,.02)!important}
+.track-card.status-new{border-left:3px solid var(--danger)!important}
+.track-card .track-header{display:contents!important}
+/* Track row cells */
+.tr-cell{padding:16px 20px!important}
+.tr-cell-ch{padding:16px 20px 16px 20px!important}
+.tr-cell-content{padding:16px 0!important}
+.tr-cell-last{padding:16px 20px 16px 0!important}
+/* Handoff card in table */
+.handoff-card{background:rgba(219,0,116,.04)!important;box-shadow:none!important;animation:none!important}
+.handoff-badge{position:static!important;display:inline-flex!important;align-items:center!important;animation:none!important;font-size:10px!important;padding:2px 7px!important;border-radius:5px!important;margin-left:6px!important;background:var(--accent)!important;color:#fff!important;box-shadow:none!important;font-weight:700!important}
+/* Preview area header */
+.preview-header{display:flex;align-items:center;gap:9px;padding:12px 16px;border-radius:16px 16px 0 0;border-bottom:1px solid var(--border);background:var(--bg3)}
+.preview-wrap-box{border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:8px}
+.preview-out{border:none!important;border-radius:0 0 16px 16px!important;background:var(--bg2)!important}
+[data-ch="amazon"] .preview-header{background:#FEF3E7;border-color:#F3D2AC}
+[data-ch="amazon"] .preview-header .ph-dot{background:#E07B1E}
+[data-ch="amazon"] .preview-header .ph-label{color:#B4741C}
+[data-ch="line"] .preview-header{background:#E8F8F1;border-color:#A7F3D0}
+[data-ch="line"] .preview-header .ph-dot{background:#1F8A5B}
+[data-ch="line"] .preview-header .ph-label{color:#1F8A5B}
+[data-ch="yahoo"] .preview-header{background:#F0EAFE;border-color:#C4B5FD}
+[data-ch="yahoo"] .preview-header .ph-dot{background:#5B31C9}
+[data-ch="yahoo"] .preview-header .ph-label{color:#5B31C9}
+[data-ch="qoo10"] .preview-header{background:#FEF9C3;border-color:#FCD34D}
+[data-ch="qoo10"] .preview-header .ph-dot{background:#92400E}
+[data-ch="qoo10"] .preview-header .ph-label{color:#92400E}
+[data-ch="rakuten"] .preview-header{background:#FFF0F0;border-color:#FCA5A5}
+[data-ch="rakuten"] .preview-header .ph-dot{background:#C0392B}
+[data-ch="rakuten"] .preview-header .ph-label{color:#C0392B}
+[data-ch="shopify"] .preview-header{background:#E8F8F1;border-color:#6EE7B7}
+[data-ch="shopify"] .preview-header .ph-dot{background:#059669}
+[data-ch="shopify"] .preview-header .ph-label{color:#059669}
+/* Per-channel preview box — override old per-channel colors */
+[data-ch] .tmpl-preview-wrap .preview-out{background:var(--bg2)!important;border:none!important}
 </style>
 </head>
 <body>
@@ -1036,20 +1078,20 @@ body{background:#F7F4EF!important}
 
     <!-- RIGHT: LIVE PREVIEW -->
     <div class="tmpl-preview-wrap" id="tmpl-preview-col" style="display:none">
-      <div class="card">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <p class="card-title" style="margin:0">📋 プレビュー</p>
-          <div style="display:flex;align-items:center;gap:8px">
-            <span style="font-size:11px;color:var(--text3)">編集可能</span>
-            <div id="lang-toggle" onclick="toggleLang()" style="display:flex;border:1px solid var(--border);border-radius:6px;overflow:hidden;cursor:pointer;font-size:11px;font-weight:600">
-              <span id="lang-jp" style="padding:3px 9px;background:var(--accent);color:#fff;transition:.15s">JP</span>
-              <span id="lang-en" style="padding:3px 9px;background:transparent;color:var(--text3);transition:.15s">EN</span>
-            </div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <!-- Preview header with channel color -->
+        <div class="preview-header">
+          <span class="ph-dot" style="width:9px;height:9px;border-radius:50%;background:var(--text3);flex-shrink:0"></span>
+          <span class="ph-label" style="font-size:14px;font-weight:700;color:var(--text2)">プレビュー</span>
+          <span id="preview-char-count-header" style="margin-left:auto;font-size:12px;color:var(--text3)"></span>
+          <div id="lang-toggle" onclick="toggleLang()" style="display:flex;border:1px solid var(--border-md);border-radius:6px;overflow:hidden;cursor:pointer;font-size:11px;font-weight:600;margin-left:10px">
+            <span id="lang-jp" style="padding:3px 9px;background:var(--accent);color:#fff;transition:.15s">JP</span>
+            <span id="lang-en" style="padding:3px 9px;background:transparent;color:var(--text3);transition:.15s">EN</span>
           </div>
         </div>
         <!-- LINE Path-B step-by-step panel -->
-        <div id="line-path-b-steps" style="display:none"></div>
-        <div class="preview-out" id="tmpl-preview" contenteditable="true"><span class="preview-empty">情報を入力するとここに表示されます</span></div>
+        <div id="line-path-b-steps" style="display:none;padding:16px"></div>
+        <div class="preview-out" id="tmpl-preview" contenteditable="true" style="padding:18px;min-height:180px;max-height:480px"><span class="preview-empty">情報を入力するとここに表示されます</span></div>
         <!-- LINE character counter (#1) -->
         <div id="line-char-counter" style="display:none;text-align:right;font-size:11px;margin-top:4px;font-family:var(--font);transition:.15s">
           <span id="line-char-count">0</span> / 500
@@ -1357,19 +1399,23 @@ body{background:#F7F4EF!important}
   </div>
   <p class="page-sub">お問い合わせの対応状況をリアルタイムで管理します</p>
 
-  <!-- STATS -->
-  <div class="grid3" style="margin-bottom:16px">
-    <div class="analysis-box" style="text-align:center;padding:12px">
-      <div style="font-size:24px;font-weight:700;color:var(--danger)" id="stat-new">-</div>
-      <div style="font-size:11px;color:var(--text2);margin-top:2px">未対応</div>
+  <!-- STATS 1d style -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px">
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:16px 18px">
+      <div style="font-size:12px;color:var(--text3);margin-bottom:4px">今日の新規</div>
+      <div style="font-size:26px;font-weight:700" id="stat-today">-</div>
     </div>
-    <div class="analysis-box" style="text-align:center;padding:12px">
-      <div style="font-size:24px;font-weight:700;color:var(--warning)" id="stat-wip">-</div>
-      <div style="font-size:11px;color:var(--text2);margin-top:2px">対応中</div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:16px;padding:16px 18px">
+      <div style="font-size:12px;color:var(--text3);margin-bottom:4px">対応中</div>
+      <div style="font-size:26px;font-weight:700;color:var(--accent)" id="stat-wip">-</div>
     </div>
-    <div class="analysis-box" style="text-align:center;padding:12px">
-      <div style="font-size:24px;font-weight:700;color:var(--success)" id="stat-done">-</div>
-      <div style="font-size:11px;color:var(--text2);margin-top:2px">完了</div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-left:4px solid var(--danger);border-radius:16px;padding:16px 18px">
+      <div style="font-size:12px;color:var(--text3);margin-bottom:4px">エスカレ</div>
+      <div style="font-size:26px;font-weight:700;color:var(--danger)" id="stat-new">-</div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-left:4px solid var(--success);border-radius:16px;padding:16px 18px">
+      <div style="font-size:12px;color:var(--text3);margin-bottom:4px">完了</div>
+      <div style="font-size:26px;font-weight:700;color:var(--success)" id="stat-done">-</div>
     </div>
   </div>
 
@@ -1460,7 +1506,13 @@ body{background:#F7F4EF!important}
     <span class="search-icon">🔍</span>
     <input type="text" id="tr-search" placeholder="お客様名・ICCID・問題内容で検索" oninput="renderTracking()">
   </div>
-  <div id="tracking-list"></div>
+  <!-- Table header -->
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;overflow:hidden">
+    <div id="tr-table-header" style="display:grid;grid-template-columns:110px 1fr 120px 120px 110px;gap:12px;padding:13px 20px;border-bottom:1px solid var(--border);font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.06em;text-transform:uppercase">
+      <div>チャンネル</div><div>内容</div><div>担当</div><div>最終更新</div><div>ステータス</div>
+    </div>
+    <div id="tracking-list"></div>
+  </div>
 </div>
 
 <!-- PAGE: REPORT -->
@@ -5633,13 +5685,19 @@ function renderTracking(){
   _updateStaleAlert();
 
   // stats — based on currently filtered view, not all records
-  const counts = { '未対応': 0, '対応中': 0, '完了': 0 };
+  const counts = { '未対応': 0, '対応中': 0, '完了': 0, 'エスカレ': 0 };
+  const today = new Date().toDateString();
+  let todayNew = 0;
   filtered.forEach(t => {
     if (t.status === '未対応') counts['未対応']++;
     else if (t.status === '対応中' || t.status === '解決済み' || t.status === '保留中' || t.status === '返信待ち') counts['対応中']++;
-    else if (t.status === '完了' || t.status === 'エスカレーション' || t.status === '対応不要' || t.status === '仮完了') counts['完了']++;
+    else if (t.status === '完了' || t.status === '対応不要' || t.status === '仮完了') counts['完了']++;
+    else if (t.status === 'エスカレーション') { counts['エスカレ']++; counts['対応中']++; }
+    if (t.date && new Date(t.date).toDateString() === today) todayNew++;
   });
-  document.getElementById('stat-new').textContent = counts['未対応'];
+  const todayEl = document.getElementById('stat-today');
+  if (todayEl) todayEl.textContent = todayNew;
+  document.getElementById('stat-new').textContent = counts['エスカレ'];
   document.getElementById('stat-wip').textContent = counts['対応中'];
   document.getElementById('stat-done').textContent = counts['完了'];
 
@@ -5689,39 +5747,45 @@ function renderTracking(){
     const trackingId = t.row ? `tracking-${t.row}` : (t.id || '');
     const isHandoff = HO._handoffCaseIds && HO._handoffCaseIds.has(trackingId);
     const hoClick = `if(HO._hoMode){HO.toggleCard(this,'${trackingId}','${(t.question||'').replace(/'/g,'').replace(/`/g,'').substring(0,40)}','${t.channel||''}','${(t.customerEmail||t.iccid||'').substring(0,30)}');}`;
+    // Channel color badge style
+    const chColors = {Amazon:'#FEF3E7|#B4741C',LINE:'#E8F8F1|#1F8A5B',Yahoo:'#F0EAFE|#5B31C9',メール:'#E9F1FE|#2F6FE0',Qoo10:'#FEF9C3|#92400E',Rakuten:'#FFF0F0|#C0392B',Shopify:'#E8F8F1|#059669'};
+    const [chBg,chFg] = (chColors[t.channel]||'#F7F5F2|#6E6B76').split('|');
+    // Status badge
+    const statusBadge = `<span style="display:inline-flex;align-items:center;font-size:12px;font-weight:700;color:${statusColor};background:${statusColor}22;border-radius:99px;padding:5px 12px">${displayStatus}</span>`;
+    // Content cell
+    const contentMain = t.channel === 'LINE'
+      ? `<span style="font-size:11px;color:var(--text3);margin-right:6px">${(t.category||'').substring(0,20)}</span>${(t.question||'（名前不明）').substring(0,50)}`
+      : `${(t.question||'').substring(0,70)}${(t.question||'').length>70?'…':''}`;
+    const contentSub = [
+      t.iccid ? `<span style="font-size:11px;color:var(--text3)">📶 ${t.iccid.substring(0,14)}…</span>` : '',
+      t.customerEmail ? `<span style="font-size:11px;color:var(--text3)">📧 ${t.customerEmail}</span>` : '',
+      isOverdue ? `<span style="font-size:11px;font-weight:600;color:var(--danger)">⏰ ${daysOld}日経過</span>` : '',
+      autoKanryo ? `<span style="font-size:11px;color:var(--text3)">返信待ち7日経過</span>` : '',
+    ].filter(Boolean).join(' ');
     return `
-    <div class="track-card ${statusCls} ${isHandoff ? 'handoff-card' : ''}" style="${isOverdue?'border-color:rgba(231,76,60,.6);background:rgba(231,76,60,.05)':''}" onclick="${hoClick}">
-      ${isHandoff ? `<div class="handoff-badge">🔖 引継ぎ <span onclick="event.stopPropagation();HO.dismissBadge('${trackingId}')" style="margin-left:4px;opacity:.7;cursor:pointer;font-size:10px">✕</span></div>` : ''}
-      <div class="track-header">
-        <div class="ho-checkbox">✓</div>
-        <span style="width:8px;height:8px;border-radius:50%;background:${statusColor};flex-shrink:0;display:inline-block"></span>
-        <span style="font-size:12px;font-weight:600;color:${statusColor}">${displayStatus}</span>
-        ${autoKanryo ? `<span style="font-size:10px;color:var(--text3);background:var(--bg3);padding:1px 6px;border-radius:4px">返信待ち7日経過</span>` : ''}
-        ${isNew ? '<span class="new-badge">NEW</span>' : ''}
-        ${isOverdue ? `<span style="font-size:11px;font-weight:600;color:var(--danger);background:var(--danger-bg);padding:2px 7px;border-radius:4px">⏰ ${daysOld}日経過</span>` : ''}
-        <span style="font-size:11px;color:var(--text3);margin-left:8px">${chIcon[t.channel]||'📌'} ${t.channel||'不明'}</span>
-        <span style="font-size:11px;color:var(--text3);margin-left:auto">${(t.date||'').replace('T',' ').substring(0,16)}</span>
+    <div class="track-card ${statusCls} ${isHandoff ? 'handoff-card' : ''}" onclick="${hoClick}">
+      <div class="tr-cell-ch" style="padding:14px 16px 14px 20px">
+        <div class="ho-checkbox" style="margin-bottom:4px">✓</div>
+        <span style="display:inline-block;font-size:12px;font-weight:700;background:${chBg};color:${chFg};border-radius:8px;padding:5px 10px">${t.channel||'不明'}</span>
+        ${isHandoff ? `<div class="handoff-badge" onclick="event.stopPropagation();HO.dismissBadge('${trackingId}')">🔖 ✕</div>` : ''}
+        ${isNew ? '<div style="margin-top:4px"><span class="new-badge">NEW</span></div>' : ''}
       </div>
-      <div style="font-size:13px;font-weight:500;margin:8px 0 6px;line-height:1.4">${
-        t.channel === 'LINE'
-          ? `<span style="color:var(--text3);font-size:11px;margin-right:6px">${(t.category||'').substring(0,20)}</span>${(t.question||'（名前不明）').substring(0,40)}`
-          : `${(t.question||'').substring(0,80)}${(t.question||'').length>80?'…':''}`
-      }</div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px">
-        ${t.customerEmail?`<span style="font-size:11px;background:var(--bg3);padding:2px 8px;border-radius:6px;color:var(--text2)">📧 ${t.customerEmail}</span>`:''}
-        ${t.iccid?`<span style="font-size:11px;background:var(--bg3);padding:2px 8px;border-radius:6px;color:var(--text2)">📶 ${t.iccid}</span>`:''}
-        ${t.orderNo?`<span style="font-size:11px;background:var(--bg3);padding:2px 8px;border-radius:6px;color:var(--text2)">🛒 ${t.orderNo}</span>`:''}
-        ${t.handler?`<span style="font-size:11px;background:var(--accent-bg);padding:2px 8px;border-radius:6px;color:var(--accent)">👤 ${t.handler}</span>`:''}
+      <div class="tr-cell-content" style="padding:14px 0;min-width:0">
+        <div style="font-size:13.5px;font-weight:500;line-height:1.4;margin-bottom:4px">${contentMain}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">${contentSub}</div>
       </div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
-        ${updateFn('対応中','🔄 対応中','var(--warning)')}
-        ${updateFn('返信待ち','⏳ 返信待ち','#3b82f6')}
-        ${updateFn('対応不要','🚫 対応不要','var(--text3)')}
-        ${updateFn('完了','✅ 完了','var(--success)')}
-        ${updateFn('エスカレーション','⚠️ エスカレ','var(--danger)')}
-        <button class="btn btn-ghost" style="font-size:11px;padding:3px 10px${isNew?';border-color:var(--danger);color:var(--danger)':''}" data-subject="${safeQ}" data-history="${safeN}" data-channel="${safeCh}" data-email="${safeEmail}" data-iccid="${safeIccid}" data-yahoourl="${t.yahooUrl||''}" data-threadid="${t.email_id||''}" onclick="showHistoryModal(this)">💬 履歴${historyMsgCount?' ('+historyMsgCount+')':''}${isNew?' 📩':''}</button>
-        ${t.row?`<button class="btn btn-ghost" style="font-size:11px;padding:3px 10px;color:var(--text3)" onclick="deleteSheetRow(${t.row},this)">🗑️</button>`:''}
-        ${t.local?`<button class="btn btn-ghost" style="font-size:11px;padding:3px 10px;color:var(--text3)" onclick="deleteTracking('${t.id}')">🗑️</button>`:''}
+      <div class="tr-cell" style="padding:14px 0;font-size:13px;color:var(--text2)">${t.handler||'—'}</div>
+      <div class="tr-cell" style="padding:14px 0;font-size:12px;color:var(--text3)">${(t.date||'').replace('T',' ').substring(0,16)}</div>
+      <div class="tr-cell" style="padding:14px 20px 14px 0">
+        ${statusBadge}
+        <div style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap">
+          ${updateFn('対応中','🔄','var(--warning)')}
+          ${updateFn('完了','✅','var(--success)')}
+          ${updateFn('エスカレーション','⚠️','var(--danger)')}
+          <button style="font-size:11px;padding:3px 8px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer${isNew?';border-color:var(--danger);color:var(--danger)':''}" data-subject="${safeQ}" data-history="${safeN}" data-channel="${safeCh}" data-email="${safeEmail}" data-iccid="${safeIccid}" data-yahoourl="${t.yahooUrl||''}" data-threadid="${t.email_id||''}" onclick="showHistoryModal(this)">💬${isNew?' 📩':''}</button>
+          ${t.row?`<button style="font-size:11px;padding:3px 8px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer" onclick="deleteSheetRow(${t.row},this)">🗑️</button>`:''}
+          ${t.local?`<button style="font-size:11px;padding:3px 8px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer" onclick="deleteTracking('${t.id}')">🗑️</button>`:''}
+        </div>
       </div>
     </div>`;
   }).join('');
@@ -6612,6 +6676,9 @@ function updatePreview() {
     }
   }
   const text = buildTemplate();
+  // Update preview header char count
+  const headerCount = document.getElementById('preview-char-count-header');
+  if (headerCount) headerCount.textContent = text && text.trim() ? `全 ${text.trim().length} 文字` : '';
   if (text && text.trim()) {
     el.textContent = text.replace(/^\n+/, '');
   } else if (isSetteiWizard) {
