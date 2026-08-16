@@ -6994,9 +6994,9 @@ function updatePreview() {
     const hint = W.iccid==='noexchange'
       ? '引き換えコードを入力するとプレビューが表示されます'
       : 'B2Bのテキストを貼り付けるとここにプレビューが表示されます';
-    el.innerHTML = `<span style="color:var(--text3);font-style:italic;font-family:var(--font)">${hint}</span>`;
+    el.innerHTML = `<span class="preview-empty">${hint}</span>`;
   } else if (S.case==='start_date' && S.startDateScenario==='②' && S.startDateIccid==='yes') {
-    el.innerHTML = `<span style="color:var(--text3);font-style:italic;font-family:var(--font)">B2Bの情報を貼り付けると自動でテンプレートが生成されます</span>`;
+    el.innerHTML = `<span class="preview-empty">B2Bの情報を貼り付けると自動でテンプレートが生成されます</span>`;
   } else {
     el.textContent = '';
   }
@@ -7015,6 +7015,11 @@ function swValidateRequired(ids){
 }
 
 function copyPreview() {
+  const previewEl = document.getElementById('tmpl-preview');
+  if (previewEl?.querySelector('.preview-empty')) {
+    showToast('⚠️ テンプレートがまだ生成されていません');
+    return;
+  }
   const isYaCancelCase = S.case==='yahoo_cancel_before'||S.case==='yahoo_cancel_after'||S.case==='amazon_cancel';
   if((S.ch==='Yahoo'||S.ch==='メール') && !isYaCancelCase){
     const nameVal=(swEl('sw-name')?.value.trim()||document.getElementById('f-name')?.value.trim()||'');
@@ -7667,8 +7672,9 @@ function updateLineCounter() {
   const warnEl    = document.getElementById('line-char-warn');
   if (!counterEl || !countEl) return;
   if (S.ch !== 'LINE') { counterEl.style.display = 'none'; return; }
-  const text = (document.getElementById('tmpl-preview')?.innerText || '').trim();
-  if (!text || text === '情報を入力するとここに表示されます') { counterEl.style.display = 'none'; return; }
+  const previewEl = document.getElementById('tmpl-preview');
+  const text = (previewEl?.innerText || '').trim();
+  if (!text || previewEl?.querySelector('.preview-empty')) { counterEl.style.display = 'none'; return; }
   const n = text.length;
   countEl.textContent = n;
   counterEl.style.display = 'block';
