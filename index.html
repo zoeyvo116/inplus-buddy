@@ -5878,7 +5878,7 @@ function renderTracking(){
     return;
   }
 
-  const chColors = {Amazon:'#FEF3E7|#B4741C',LINE:'#E8F8F1|#1F8A5B',Yahoo:'#F0EAFE|#5B31C9',メール:'#E9F1FE|#2F6FE0',Qoo10:'#FEF9C3|#92400E',Rakuten:'#FFF0F0|#C0392B',Shopify:'#E8F8F1|#059669'};
+  const chColors = {Amazon:'#E8640A|#fff',LINE:'#06C755|#fff',Yahoo:'#6B21D6|#fff',メール:'#2563EB|#fff',Qoo10:'#F59E0B|#fff',Rakuten:'#C0392B|#fff',Shopify:'#059669|#fff',CMLink:'#0F7AE5|#fff',Website:'#475569|#fff'};
   const statusColors = {
     '未対応':'#E8443A','対応中':'#E8943A','完了':'#27ae60','解決済み':'#27ae60',
     '保留中':'#8B5CF6','エスカレーション':'#E8443A','対応不要':'#A0A0A0','返信待ち':'#3b82f6','仮完了':'#A0A0A0'
@@ -5939,7 +5939,7 @@ function openTrackingDetail(t) {
   document.querySelector(`.tr-row[data-trackid="${trackingId}"]`)?.classList.add('on');
 
   const col = document.getElementById('tr-detail-col');
-  const chColors = {Amazon:'#FEF3E7|#B4741C',LINE:'#E8F8F1|#1F8A5B',Yahoo:'#F0EAFE|#5B31C9',メール:'#E9F1FE|#2F6FE0',Qoo10:'#FEF9C3|#92400E',Rakuten:'#FFF0F0|#C0392B',Shopify:'#E8F8F1|#059669'};
+  const chColors = {Amazon:'#E8640A|#fff',LINE:'#06C755|#fff',Yahoo:'#6B21D6|#fff',メール:'#2563EB|#fff',Qoo10:'#F59E0B|#fff',Rakuten:'#C0392B|#fff',Shopify:'#059669|#fff',CMLink:'#0F7AE5|#fff',Website:'#475569|#fff'};
   const statusColors = {
     '未対応':'#E8443A','対応中':'#E8943A','完了':'#27ae60','解決済み':'#27ae60',
     '保留中':'#8B5CF6','エスカレーション':'#E8443A','対応不要':'#A0A0A0','返信待ち':'#3b82f6','仮完了':'#A0A0A0'
