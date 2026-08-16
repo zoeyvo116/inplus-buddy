@@ -589,7 +589,7 @@ body{
 .tr-det-banner{padding:8px 20px;font-size:12px;border-bottom:1px solid #F0EDE9;background:#FAFAF8}
 /* Thread */
 .tr-det-thread{flex:1;overflow-y:auto;padding:16px 20px}
-.tr-det-thread .bubble-row.staff .bubble-body{background:#DB0074;border-color:#DB0074;color:#fff}
+.tr-det-thread .bubble-row.staff .bubble-body{background:var(--ch-color,#DB0074);border-color:var(--ch-color,#DB0074);color:#fff}
 .tr-det-thread .bubble-row.customer .bubble-body{background:#fff;border:1px solid #EDE9E5;color:var(--text)}
 /* Footer */
 .tr-det-footer{padding:10px 14px;border-top:1px solid #F0EDE9;flex-shrink:0;background:#fff}
@@ -6021,13 +6021,23 @@ function openTrackingDetail(t) {
     tmplOptions += '</optgroup>';
   });
 
-  // Channel accent colors (tint bg from solid color)
-  const chTints = {Amazon:'#FFF2E8',LINE:'#E8FBF0',Yahoo:'#F0E8FD',メール:'#E8F0FD',Qoo10:'#FEF9E0',Rakuten:'#FDE8E8',Shopify:'#E8F8F2',CMLink:'#E8F3FD',Website:'#F0F2F5'};
-  const chTint = chTints[t.channel] || '#F9F7F5';
+  // Channel tints: [dark tint, light tint] for gradient
+  const chTintMap = {
+    Amazon:  ['#FFE8D0','#FFF5EC'],
+    LINE:    ['#D0F5E2','#EDFAF3'],
+    Yahoo:   ['#E6D5FC','#F3EAFE'],
+    メール:  ['#D5E6FC','#EBF3FE'],
+    Qoo10:   ['#FDF0C0','#FEF8E0'],
+    Rakuten: ['#FDD5D5','#FEECEC'],
+    Shopify: ['#C8F0E2','#E5F9F2'],
+    CMLink:  ['#CCE8FA','#E5F3FD'],
+    Website: ['#D8DDE6','#ECEEF2'],
+  };
+  const [chTint1, chTint2] = chTintMap[t.channel] || ['#EDE9E5','#F5F3F0'];
   const chAccent = chBg; // solid channel color
 
   col.innerHTML = `
-    <div class="tr-det-hdr" style="border-left:4px solid ${chAccent};background:linear-gradient(135deg,${chTint} 0%,#fff 60%)">
+    <div class="tr-det-hdr" style="border-left:6px solid ${chAccent};background:linear-gradient(135deg,${chTint1} 0%,${chTint2} 100%)">
       <div class="tr-det-top">
         <div class="tr-det-title">${(t.question||'（件名なし）').replace(/</g,'&lt;')}</div>
         <div style="display:flex;gap:6px;flex-shrink:0;align-items:center">
@@ -6044,7 +6054,7 @@ function openTrackingDetail(t) {
       </div>
     </div>
     ${bannerHtml}
-    <div class="tr-det-thread" id="tr-det-thread">${threadHtml}</div>
+    <div class="tr-det-thread" id="tr-det-thread" style="--ch-color:${chAccent}">${threadHtml}</div>
     <div class="tr-det-footer">
       <div style="display:flex;gap:6px;margin-bottom:8px;align-items:center">
         <span style="font-size:11px;color:var(--text3);white-space:nowrap">テンプレ：</span>
