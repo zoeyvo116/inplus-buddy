@@ -483,9 +483,18 @@ body{
 .handoff-card{background:rgba(219,0,116,.04)!important;box-shadow:none!important;animation:none!important}
 .handoff-badge{position:static!important;display:inline-flex!important;align-items:center!important;animation:none!important;font-size:10px!important;padding:2px 7px!important;border-radius:5px!important;margin-left:6px!important;background:var(--accent)!important;color:#fff!important;box-shadow:none!important;font-weight:700!important}
 /* Preview area header */
-.preview-header{display:flex;align-items:center;gap:9px;padding:12px 16px;border-radius:16px 16px 0 0;border-bottom:1px solid var(--border);background:var(--bg3)}
+.preview-header{display:flex;align-items:center;gap:9px;padding:14px 18px;border-radius:16px 16px 0 0;border-bottom:1px solid var(--border);background:var(--bg3)}
 .preview-wrap-box{border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:8px}
-.preview-out{border:none!important;border-radius:0 0 16px 16px!important;background:var(--bg2)!important}
+/* Single-frame: no inner border-radius on preview content */
+.preview-out{border:none!important;border-radius:0!important;background:var(--bg2)!important;padding:20px 18px!important}
+/* Channel-colored card border + glow for preview panel */
+.tmpl-preview-wrap .card{border-width:1.5px!important;border-color:rgba(219,0,116,.35)!important;box-shadow:0 4px 22px rgba(219,0,116,.1)!important}
+[data-ch="line"] .tmpl-preview-wrap .card{border-color:#6EE7B7!important;box-shadow:0 4px 22px rgba(31,138,91,.14)!important}
+[data-ch="amazon"] .tmpl-preview-wrap .card{border-color:#F9B89A!important;box-shadow:0 4px 22px rgba(224,123,30,.14)!important}
+[data-ch="yahoo"] .tmpl-preview-wrap .card{border-color:#A78BFA!important;box-shadow:0 4px 22px rgba(91,49,201,.14)!important}
+[data-ch="メール"] .tmpl-preview-wrap .card,[data-ch="mail"] .tmpl-preview-wrap .card{border-color:#93C5FD!important;box-shadow:0 4px 22px rgba(59,130,246,.14)!important}
+[data-ch="qoo10"] .tmpl-preview-wrap .card{border-color:#FCD34D!important;box-shadow:0 4px 22px rgba(146,64,14,.1)!important}
+[data-ch="rakuten"] .tmpl-preview-wrap .card{border-color:#FCA5A5!important;box-shadow:0 4px 22px rgba(192,57,43,.1)!important}
 [data-ch="amazon"] .preview-header{background:#FEF3E7;border-color:#F3D2AC}
 [data-ch="amazon"] .preview-header .ph-dot{background:#E07B1E}
 [data-ch="amazon"] .preview-header .ph-label{color:#B4741C}
@@ -1272,8 +1281,8 @@ body{
           <div id="sw-esim-del-attach-list"></div>
           <div style="font-size:11px;color:var(--text3);margin-top:6px">💡 まだダウンロードしていない場合は上記ファイルをローカルに保存してから添付してください</div>
         </div>
-        <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
-          <p style="font-size:11px;color:var(--text3);margin-bottom:6px">💡 プレビューは直接編集できます。コピー前に内容を調整してください。</p>
+        <div style="padding:10px 18px 14px;border-top:1px solid var(--border)">
+          <p style="font-size:11px;color:var(--text3);margin:0">💡 プレビューは直接編集できます。コピー前に内容を調整してください。</p>
         </div>
       </div>
     </div>
