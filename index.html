@@ -599,6 +599,14 @@ body{
 .tr-tmpl-btn:hover{background:#F0EDE9}
 .tr-send-btn{width:36px;height:36px;border-radius:99px;background:#DB0074;border:none;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:16px;transition:.15s}
 .tr-send-btn:hover{opacity:.85}
+/* Date filter row */
+.tr-date-row{display:flex;gap:4px;padding:6px 10px;border-bottom:1px solid #F0EDE9;flex-shrink:0;flex-wrap:wrap}
+.tr-date-btn{font-size:11px;padding:3px 10px;border-radius:99px;border:1px solid #EDE9E5;background:transparent;color:#A09893;cursor:pointer;font-family:var(--font);transition:.15s;font-weight:500}
+.tr-date-btn.on{background:#DB0074;border-color:#DB0074;color:#fff;font-weight:600}
+/* Resize handle */
+.tr-resize-handle{width:5px;cursor:col-resize;background:transparent;flex-shrink:0;transition:background .15s;position:relative}
+.tr-resize-handle::after{content:'';position:absolute;inset:0 1px;background:#E8E3DE;opacity:0;transition:.15s}
+.tr-resize-handle:hover::after,.tr-resize-handle.dragging::after{opacity:1}
 /* Add form overlay */
 .tr-add-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:flex;align-items:center;justify-content:center}
 .tr-add-box{background:#fff;border-radius:20px;padding:24px;width:560px;max-width:94vw;max-height:88vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
@@ -1569,9 +1577,19 @@ body{
         <span class="tr-search-icon">🔍</span>
         <input type="text" id="tr-search" placeholder="お客様名・ICCIDで検索" oninput="renderTracking()">
       </div>
+      <!-- Date filter -->
+      <div class="tr-date-row">
+        <button class="tr-date-btn on" data-d="7" onclick="trSetDate(this)">7日</button>
+        <button class="tr-date-btn" data-d="14" onclick="trSetDate(this)">14日</button>
+        <button class="tr-date-btn" data-d="30" onclick="trSetDate(this)">30日</button>
+        <button class="tr-date-btn" data-d="0" onclick="trSetDate(this)">全て</button>
+      </div>
       <!-- Case list -->
       <div class="tr-list-scroll" id="tracking-list"></div>
     </div>
+
+    <!-- Resize handle -->
+    <div class="tr-resize-handle" id="tr-resize-handle"></div>
 
     <!-- Right: detail -->
     <div class="tr-detail-col" id="tr-detail-col">
@@ -5507,6 +5525,13 @@ function trSetTab(el){
   renderTracking();
 }
 
+function trSetDate(el){
+  document.querySelectorAll('.tr-date-btn').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  TR_DATE_DAYS = parseInt(el.dataset.d);
+  renderTracking();
+}
+
 function showAddTracking(){
   const f=document.getElementById('add-tracking-form');
   f.style.display=f.style.display==='none'?'flex':'none';
@@ -5816,8 +5841,16 @@ function renderTracking(){
       || t.status === TR_FILTER
       || (TR_FILTER === '対応中' && ['対応中','保留中','返信待ち','解決済み','未対応'].includes(t.status))
       || (TR_FILTER === '完了' && ['完了','対応不要','仮完了'].includes(t.status));
-    return matchQ && matchF;
+    let matchD = true;
+    if (TR_DATE_DAYS > 0) {
+      const latestMs = getLatestActivityMs(t);
+      matchD = latestMs > 0 && (now - latestMs) <= TR_DATE_DAYS * 86400000;
+    }
+    return matchQ && matchF && matchD;
   });
+
+  // Sort by latest activity descending
+  filtered.sort((a,b) => getLatestActivityMs(b) - getLatestActivityMs(a));
 
   _updateStaleAlert();
 
@@ -8841,6 +8874,40 @@ document.addEventListener('click', e => {
 </script>
 
 <script>
+/* Resizable tracking list column */
+(function(){
+  function init(){
+    const handle = document.getElementById('tr-resize-handle');
+    const listCol = document.querySelector('.tr-list-col');
+    if (!handle || !listCol) return;
+    let startX, startW, dragging = false;
+    handle.addEventListener('mousedown', e => {
+      startX = e.clientX;
+      startW = listCol.offsetWidth;
+      dragging = true;
+      handle.classList.add('dragging');
+      document.body.style.userSelect = 'none';
+      document.body.style.cursor = 'col-resize';
+      e.preventDefault();
+    });
+    document.addEventListener('mousemove', e => {
+      if (!dragging) return;
+      const newW = Math.max(180, Math.min(520, startW + (e.clientX - startX)));
+      listCol.style.width = newW + 'px';
+    });
+    document.addEventListener('mouseup', () => {
+      if (!dragging) return;
+      dragging = false;
+      handle.classList.remove('dragging');
+      document.body.style.userSelect = '';
+      document.body.style.cursor = '';
+    });
+  }
+  // wait for DOM
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else setTimeout(init, 300);
+})();
+
 /* Stepper for template page */
 (function(){
   const STEPS = [
