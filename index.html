@@ -1940,11 +1940,46 @@ body{
         <span style="font-size:13px;font-weight:600;color:var(--text)">会話テキストをペースト</span>
         <button class="btn btn-ghost" style="font-size:11px;padding:3px 10px" onclick="LP.clear()">クリア</button>
       </div>
-      <textarea id="lp-input" rows="18" placeholder="LINEの会話をここにペーストしてください..." style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--text);font-size:12px;font-family:var(--font);resize:vertical;outline:none;line-height:1.6" oninput="LP.onInput()"></textarea>
+      <textarea id="lp-input" rows="18" placeholder="LINEの会話をここにペーストしてください..." style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--text);font-size:12px;font-family:var(--font);resize:vertical;outline:none;line-height:1.6" oninput="LP.onInput()" onkeydown="if(event.ctrlKey&&event.key==='Enter'){event.preventDefault();LP.parse();}"></textarea>
       <button class="btn btn-primary btn-full" style="margin-top:10px" onclick="LP.parse()">💬 会話を解析する →</button>
     </div>
     <!-- EXTRACTED INFO + SUGGEST -->
     <div>
+      <!-- Placeholder shown before analysis -->
+      <div id="lp-placeholder" class="card" style="padding:22px">
+        <div style="text-align:center;margin-bottom:16px">
+          <div style="font-size:30px;margin-bottom:8px">💬</div>
+          <p style="font-weight:600;color:var(--text);margin-bottom:4px;font-size:13px">解析結果がここに表示されます</p>
+          <p style="font-size:11px;color:var(--text3)">左に会話テキストをペーストして「解析する」を押してください<br><span style="opacity:.7">（Ctrl+Enter でも解析できます）</span></p>
+        </div>
+        <div style="background:var(--bg3);border-radius:10px;padding:12px;margin-bottom:12px">
+          <p style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:7px">📋 自動で抽出される情報</p>
+          <div style="display:flex;flex-direction:column;gap:4px;font-size:11px;color:var(--text2)">
+            <span>👤 お客様名</span>
+            <span>📅 購入日</span>
+            <span>📱 ICCID番号</span>
+            <span>🔍 問題カテゴリ（12種類）</span>
+            <span>📊 対応ステータス（解決済 / 対応中 / 返答待ち）</span>
+          </div>
+        </div>
+        <div>
+          <p style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:7px">🏷️ 検出可能な問題カテゴリ</p>
+          <div style="display:flex;flex-wrap:wrap;gap:4px">
+            <span style="font-size:10px;padding:2px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;color:var(--text3)">利用開始日・起算日</span>
+            <span style="font-size:10px;padding:2px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;color:var(--text3)">QRコード・インストール</span>
+            <span style="font-size:10px;padding:2px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;color:var(--text3)">電波・ネット接続不可</span>
+            <span style="font-size:10px;padding:2px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;color:var(--text3)">APN設定</span>
+            <span style="font-size:10px;padding:2px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;color:var(--text3)">ローミング設定</span>
+            <span style="font-size:10px;padding:2px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;color:var(--text3)">eSIM削除・消えた</span>
+            <span style="font-size:10px;padding:2px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;color:var(--text3)">速度低下</span>
+            <span style="font-size:10px;padding:2px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;color:var(--text3)">キャンセル・返金</span>
+            <span style="font-size:10px;padding:2px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;color:var(--text3)">音声通話・SMS</span>
+            <span style="font-size:10px;padding:2px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;color:var(--text3)">メール未着</span>
+            <span style="font-size:10px;padding:2px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;color:var(--text3)">端末互換性</span>
+            <span style="font-size:10px;padding:2px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;color:var(--text3)">商品・プラン情報</span>
+          </div>
+        </div>
+      </div>
       <div id="lp-info-box" style="display:none" class="card" style="padding:16px;margin-bottom:12px">
         <p class="card-title" style="margin-bottom:10px">📋 抽出情報</p>
         <div id="lp-info-content"></div>
@@ -5983,7 +6018,7 @@ function openTrackingDetail(t) {
     bannerHtml = `<div class="tr-det-banner" style="display:flex;align-items:center;gap:10px">
       <span style="font-size:11px;color:var(--text3)">メール全文はメールソフトでご確認ください</span>
       ${gmailUrl ? `<a href="${gmailUrl}" target="_blank" style="color:var(--accent);font-size:12px;font-weight:600;text-decoration:none">📧 Gmail →</a>` : ''}
-      ${searchTerm ? `<button onclick="navigator.clipboard.writeText(${JSON.stringify(searchTerm)});this.textContent='コピー済み✓';setTimeout(()=>this.textContent='🔍 検索キー',1500)" style="background:none;border:1px solid var(--text3);color:var(--text2);border-radius:4px;padding:2px 7px;font-size:11px;cursor:pointer">🔍 検索キー</button>` : ''}
+      ${searchTerm ? `<button data-copy="${searchTerm.replace(/"/g,'&quot;')}" onclick="navigator.clipboard.writeText(this.dataset.copy);this.textContent='コピー済み✓';setTimeout(()=>this.textContent='🔍 検索キー',1500)" style="background:none;border:1px solid var(--text3);color:var(--text2);border-radius:4px;padding:2px 7px;font-size:11px;cursor:pointer">🔍 検索キー</button>` : ''}
     </div>`;
   }
 
@@ -8535,6 +8570,8 @@ const LP = {
     document.getElementById('lp-dialog').style.display = 'none';
     document.getElementById('lp-info-box').style.display = 'none';
     document.getElementById('lp-bot-box').style.display = 'none';
+    const ph = document.getElementById('lp-placeholder');
+    if (ph) ph.style.display = '';
     this._botBlocks = []; this._nonBotBlocks = []; this._extracted = {}; this._stateResult = {};
   },
 
@@ -8663,7 +8700,9 @@ const LP = {
     const botCount = this._botBlocks.length;
     const nonBotCount = this._nonBotBlocks.length;
 
-    // Info box — editable fields
+    // Hide placeholder, show info box
+    const ph = document.getElementById('lp-placeholder');
+    if (ph) ph.style.display = 'none';
     document.getElementById('lp-info-box').style.display = '';
     const issueOptions = ['', ...Object.keys(this.ISSUE_DETECT)].map(k =>
       `<option value="${k}" ${k === (extracted.issueType||'') ? 'selected' : ''}>${k || '（未検出）'}</option>`
