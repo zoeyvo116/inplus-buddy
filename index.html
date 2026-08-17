@@ -247,9 +247,9 @@ select option{background:var(--bg3)}
 .handoff-card .track-header{padding-top:14px}
 @keyframes pulse-border{0%,100%{box-shadow:0 0 0 2px rgba(240,78,140,.3),0 4px 20px rgba(240,78,140,.15)}50%{box-shadow:0 0 0 3px rgba(240,78,140,.6),0 4px 24px rgba(240,78,140,.3)}}
 /* Handoff mode */
-.ho-mode .track-card{cursor:pointer;transition:outline .15s}
-.ho-mode .track-card:hover{outline:2px solid var(--accent);outline-offset:-2px}
-.ho-mode .track-card.ho-selected{outline:2px solid #27ae60;background:rgba(39,174,96,.07)!important}
+.ho-mode .track-card,.ho-mode .tr-row{cursor:pointer;transition:outline .15s}
+.ho-mode .track-card:hover,.ho-mode .tr-row:hover{outline:2px solid var(--accent);outline-offset:-2px}
+.ho-mode .track-card.ho-selected,.ho-mode .tr-row.ho-selected{outline:2px solid #27ae60;background:rgba(39,174,96,.07)!important}
 .ho-checkbox{width:18px;height:18px;border-radius:5px;border:2px solid var(--border);background:var(--bg2);display:none;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;margin-right:2px}
 .ho-mode .ho-checkbox{display:flex}
 .ho-selected .ho-checkbox{background:#27ae60;border-color:#27ae60;color:#fff}
@@ -8162,7 +8162,7 @@ const HO = {
 
   toggleCard(el, caseId, label, channel, sub) {
     if (!this._hoMode) return;
-    const card = el.closest('.track-card');
+    const card = el.closest('.track-card') || el.closest('.tr-row');
     if (!card) return;
     if (this._selectedCases[caseId]) {
       delete this._selectedCases[caseId];
