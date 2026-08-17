@@ -8632,28 +8632,22 @@ const HO = {
     // Scroll to card
     HO.closeBanner();
     goPage('tracking', document.querySelector('.nav-item[onclick*="tracking"]'));
-    setTimeout(() => {
-      // Find the row in new inbox layout
+    // Switch date filter to 全て so the case is always visible
+    const allBtn = document.querySelector('.tr-date-btn[data-d="0"]');
+    if (allBtn && typeof trSetDate === 'function') trSetDate(allBtn);
+    const tryOpen = (attempt) => {
       const row = document.querySelector(`.tr-row[data-trackid="${caseId}"]`);
       if (row) {
         row.scrollIntoView({ behavior: 'smooth', block: 'center' });
         row.click();
         row.style.transition = 'outline .15s';
-        row.style.outline = '3px solid var(--accent)';
-        setTimeout(() => row.style.outline = '', 2000);
-        return;
+        row.style.outline = '3px solid #DB0074';
+        setTimeout(() => row.style.outline = '', 2500);
+      } else if (attempt < 4) {
+        setTimeout(() => tryOpen(attempt + 1), 300);
       }
-      // Fallback: old track-card layout
-      const cards = document.querySelectorAll('.track-card');
-      for (const card of cards) {
-        if ((card.getAttribute('onclick') || '').includes(caseId)) {
-          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          card.style.outline = '3px solid var(--accent)';
-          setTimeout(() => card.style.outline = '', 2000);
-          break;
-        }
-      }
-    }, 500);
+    };
+    setTimeout(() => tryOpen(0), 400);
   },
 
   _getActiveCases() {
@@ -9191,8 +9185,15 @@ document.addEventListener('click', e => {
     if (tb) tb.textContent = name;
     gate.style.display = 'none';
     document.body.style.overflow = '';
-    // Trigger banner check after login
-    setTimeout(() => { if(typeof HO !== 'undefined') { HO.checkBanner(); HO.startAutoCheck(); } }, 800);
+    // Trigger banner check after login — wait for tracking data to load
+    setTimeout(() => {
+      if (typeof HO === 'undefined') return;
+      HO.startAutoCheck();
+      const doCheck = () => HO.checkBanner();
+      if (typeof loadTrackingFromSheet === 'function') {
+        loadTrackingFromSheet().then(doCheck).catch(doCheck);
+      } else { doCheck(); }
+    }, 500);
   }
 
   function renderNameList() {
