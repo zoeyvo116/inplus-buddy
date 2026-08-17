@@ -9057,34 +9057,43 @@ const LP = {
     showToast(`テンプレートページへ移動しました`);
   },
 
-  createCase(status) {
+  async createCase(status) {
     const e = this._getEdited();
-    // Auto-完了 when conversation state is resolved
     const autoStatus = status || (this._stateResult?.state === 'resolved' ? '完了' : '対応中');
-    const item = {
-      id:       'CS-' + Date.now(),
-      date:     new Date().toLocaleDateString('ja-JP'),
-      customer: e.name || '（未入力）',
-      channel:  'LINE',
-      iccid:    e.iccid || '',
-      handler:  '',
-      issue:    e.issueType || '（未分類）',
-      last:     this._rawText || '',
-      status:   autoStatus,
-    };
-    tracking.unshift(item);
-    localStorage.setItem('inplus_tracking', JSON.stringify(tracking));
-    renderTracking();
-    const staffList = (CM._staffCache || []);
-    const staffOpts = staffList.map(s => `<option value="${s}">${s}</option>`).join('');
+    const customerName = e.name || '（未入力）';
+    const issueType = e.issueType || '（未分類）';
+    const notes = this._rawText || '';
+
     const sb = document.getElementById('lp-suggest-box');
+    if (sb) sb.innerHTML = `<div style="padding:8px 0;font-size:13px;color:var(--text2)">⏳ Sheetに保存中...</div>`;
+
+    // Save to Google Sheet
+    const params = new URLSearchParams({
+      action: 'addTracking',
+      channel: 'LINE',
+      product: '',
+      category: issueType,
+      question: customerName + (e.iccid ? ` / ICCID: ${e.iccid}` : ''),
+      cause: issueType,
+      solution: '',
+      escalation: '',
+      handler: localStorage.getItem('inplus_staff_name') || '',
+      status: autoStatus,
+      notes: notes.substring(0, 2000),
+    });
+
+    try {
+      await fetch(`${API_URL}?${params.toString()}`);
+    } catch(err) {
+      showToast('⚠️ Sheet保存に失敗しました');
+    }
+
+    // Reload sheet data so new case appears
+    await loadTrackingFromSheet();
+    renderTracking();
+
     if (sb) sb.innerHTML = `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:6px 0">
-      <span style="font-size:13px">${item.status === '完了' ? '✅' : '📋'} 保存済み — ${item.status}（${item.customer}）</span>
-      <span style="font-size:12px;color:var(--text3)">担当者：</span>
-      <select id="lp-handler-sel" style="font-size:12px;border:1px solid var(--border);border-radius:7px;padding:3px 8px;background:var(--bg2);color:var(--text);outline:none">
-        <option value="">（未設定）</option>${staffOpts}
-      </select>
-      <button onclick="(function(){const v=document.getElementById('lp-handler-sel').value;const t=tracking.find(x=>x.id==='${item.id}');if(t)t.handler=v;localStorage.setItem('inplus_tracking',JSON.stringify(tracking));renderTracking();showToast('担当者を設定しました')})()" style="font-size:12px;padding:4px 12px;border-radius:7px;border:none;background:var(--accent);color:#fff;cursor:pointer;font-weight:600">設定</button>
+      <span style="font-size:13px">${autoStatus === '完了' ? '✅' : '📋'} Sheetに保存済み — ${autoStatus}（${customerName}）</span>
     </div>`;
     goPage('tracking', document.querySelector('.nav-item[onclick*="tracking"]'));
   },
