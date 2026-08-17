@@ -8575,7 +8575,7 @@ const HO = {
         ${notes.map(n => `<div style="margin-bottom:8px;padding:8px;background:rgba(39,174,96,.08);border-radius:6px">
           <div style="font-size:12px;font-weight:700;color:#2ecc71;margin-bottom:3px">${n.customer_name}</div>
           <div style="font-size:13px;color:var(--text);line-height:1.5">${n.note}</div>
-          <button onclick="HO._openCase('${n.case_id}')" style="margin-top:6px;font-size:11px;padding:2px 10px;background:rgba(39,174,96,.2);border:1px solid rgba(39,174,96,.4);border-radius:4px;color:#2ecc71;cursor:pointer">→ 開く</button>
+          <button onclick="HO.closeHandoff();HO._openCase('${n.case_id}',true)" style="margin-top:6px;font-size:11px;padding:2px 10px;background:rgba(39,174,96,.2);border:1px solid rgba(39,174,96,.4);border-radius:4px;color:#2ecc71;cursor:pointer">→ 開く</button>
         </div>`).join('')}
       </div>`;
     }).filter(Boolean).join('') || `<div style="font-size:12px;color:var(--text3);font-style:italic">引継ぎメモなし</div>`;
@@ -8605,12 +8605,12 @@ const HO = {
     renderTracking && renderTracking();
   },
 
-  _openCase(caseId) {
+  _openCase(caseId, skipNote) {
     const n = (this._bannerNotes || {})[caseId];
     const customerName = n ? n.customer_name : '';
     const note = n ? n.note : '';
-    // Show note modal if note exists
-    if (note) {
+    // Show note modal if note exists and not skipping
+    if (note && !skipNote) {
       document.getElementById('_ho_note_overlay')?.remove();
       const m = document.createElement('div');
       m.id = '_ho_note_overlay';
@@ -8623,7 +8623,7 @@ const HO = {
         </div>
         <div style="font-size:14px;color:var(--text);white-space:pre-wrap;line-height:1.7">${note.replace(/\\n/g,'\n')}</div>
         <div style="margin-top:18px;text-align:right">
-          <button onclick="document.getElementById('_ho_note_overlay').remove();HO._openCase('${caseId}')" style="font-size:12px;padding:6px 18px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer;font-weight:600">💬 対応履歴を見る</button>
+          <button onclick="document.getElementById('_ho_note_overlay').remove();HO._openCase('${caseId}',true)" style="font-size:12px;padding:6px 18px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer;font-weight:600">💬 対応履歴を見る</button>
         </div>
       </div>`;
       m.addEventListener('click', e => { if (e.target === m) m.remove(); });
