@@ -607,10 +607,13 @@ body{
 .tr-overview-mode .tr-row{border-bottom:none;border-radius:12px;border:1px solid #F0EDE9;box-shadow:0 1px 6px rgba(0,0,0,.05);margin:0}
 .tr-overview-mode .tr-row.on{border-color:#DB0074}
 /* Collapsed detail strip */
-.tr-detail-collapsed{width:32px!important;min-width:32px!important;flex:none!important;overflow:hidden;cursor:pointer;display:flex!important;align-items:center;justify-content:center;background:#F5F2EF;border-left:1px solid #E8E3DE;transition:none}
+.tr-detail-collapsed{width:32px!important;min-width:32px!important;flex:none!important;overflow:hidden;cursor:pointer;display:flex!important;align-items:center;justify-content:center;background:#DB0074;border-left:none;transition:none}
+.tr-detail-collapsed:hover{background:#C5006A}
 .tr-detail-collapsed>*:not(.tr-detail-restore-hint){display:none!important}
-.tr-detail-restore-hint{display:flex;flex-direction:column;align-items:center;gap:6px;color:#B0A89E;font-size:10px;writing-mode:vertical-rl;letter-spacing:.05em;padding:12px 0;user-select:none}
-.tr-detail-restore-hint svg{transform:rotate(180deg)}
+.tr-detail-restore-hint{display:flex;flex-direction:column;align-items:center;gap:6px;color:rgba(255,255,255,.9);font-size:10px;font-weight:600;writing-mode:vertical-rl;letter-spacing:.06em;padding:12px 0;user-select:none}
+.tr-detail-restore-hint svg{transform:rotate(180deg);stroke:rgba(255,255,255,.9)}
+/* Full title in overview grid cards - no truncation */
+.tr-overview-mode .tr-row-title{white-space:normal!important;overflow:visible!important;text-overflow:unset!important;-webkit-line-clamp:unset!important;display:block!important}
 .tr-row{padding:11px 14px;border-bottom:1px solid #F5F2EF;cursor:pointer;transition:background .1s;border-left:3px solid transparent}
 .tr-row:hover{background:#FAF8F6}
 .tr-row.on{background:rgba(219,0,116,.05);border-left-color:#DB0074}
@@ -9138,11 +9141,12 @@ document.addEventListener('click', e => {
     document.addEventListener('mousemove', e => {
       if (!dragging) return;
       const inbox = document.querySelector('.tr-inbox');
-      const maxW = inbox ? inbox.offsetWidth - 10 : window.innerWidth - 100;
+      const STRIP_W = 32;
+      const maxW = inbox ? inbox.offsetWidth - STRIP_W - 5 : window.innerWidth - 100;
       const newW = Math.max(180, Math.min(maxW, startW + (e.clientX - startX)));
       listCol.style.width = newW + 'px';
-      // When list col is nearly full width → overview mode (collapse detail to strip)
-      const overviewMode = newW > maxW * 0.72;
+      // Overview mode only when list col is at the maximum (touching the strip)
+      const overviewMode = newW >= maxW - 2;
       listCol.classList.toggle('tr-overview-mode', overviewMode);
       const detailCol = document.getElementById('tr-detail-col');
       if (detailCol) detailCol.classList.toggle('tr-detail-collapsed', overviewMode);
