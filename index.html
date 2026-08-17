@@ -6156,7 +6156,7 @@ function openTrackingDetail(t) {
         <span class="tr-det-badge" style="background:${chBg};color:${chFg}">${t.channel||'不明'}</span>
         <span class="tr-det-st" style="color:${stColor};background:${stColor}22">${displayStatus}</span>
         ${t.customerEmail ? `<span style="color:var(--text3)">${t.customerEmail.replace(/</g,'&lt;')}</span>` : ''}
-        ${t.iccid ? `<span style="color:var(--text3)">ICCID ${(t.iccid||'').substring(0,14)}…</span>` : ''}
+        ${t.iccid ? `<span style="font-size:11px;font-weight:700;font-family:monospace;letter-spacing:.04em;background:#EEF4FF;color:#2563EB;padding:2px 8px;border-radius:5px;cursor:pointer" onclick="navigator.clipboard.writeText('${t.iccid}');this.textContent='コピー済み✓';setTimeout(()=>this.textContent='📶 ${t.iccid}',1500)" title="クリックでコピー">📶 ${t.iccid}</span>` : ''}
         ${daysOld >= 1 ? `<span style="color:#E8443A;font-weight:600">${daysOld}日経過</span>` : ''}
         ${t.handler ? `<span style="color:var(--text3)">担当: ${t.handler}</span>` : ''}
       </div>
@@ -7592,7 +7592,7 @@ const CM = {
 
   // ── Staff modal ──
   _staffCache: null,
-  _defaultStaff: ['Kimura','Izu','Chuck','Zoey'],
+  _defaultStaff: ['きむら','いず','チャック','ゾーイ'],
 
   async _loadStaffList() {
     // 1. Try localStorage cache
