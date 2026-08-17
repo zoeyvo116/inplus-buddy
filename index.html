@@ -7592,6 +7592,7 @@ const CM = {
 
   // ── Staff modal ──
   _staffCache: null,
+  _defaultStaff: ['Kimura','Izu','Chuck','Zoey'],
 
   async _loadStaffList() {
     // 1. Try localStorage cache
@@ -7614,6 +7615,15 @@ const CM = {
         const names = [...new Set(list.map(h => h.staff).filter(Boolean))];
         if (names.length) { this._staffCache = names; localStorage.setItem('inplus_staff_list', JSON.stringify(names)); }
       } catch(e) {}
+    }
+    // 4. Final fallback: use default staff list
+    if (!this._staffCache || !this._staffCache.length) {
+      this._staffCache = [...this._defaultStaff];
+    } else {
+      // Merge defaults with any fetched names (defaults first if not already present)
+      const existing = new Set(this._staffCache);
+      const merged = [...this._staffCache, ...this._defaultStaff.filter(s => !existing.has(s))];
+      this._staffCache = merged;
     }
     return this._staffCache || [];
   },
