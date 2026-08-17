@@ -600,6 +600,12 @@ body{
 .tr-search-icon{position:absolute;left:20px;top:50%;transform:translateY(-50%);color:#B0ABA6;font-size:13px;pointer-events:none}
 /* List rows */
 .tr-list-scroll{flex:1;overflow-y:auto}
+/* Overview mode: list col expands full, cards go grid */
+.tr-overview-mode{width:100%!important;border-right:none!important}
+.tr-overview-mode .tr-list-scroll{overflow-y:auto}
+.tr-overview-mode #tracking-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;padding:12px}
+.tr-overview-mode .tr-row{border-bottom:none;border-radius:12px;border:1px solid #F0EDE9;box-shadow:0 1px 6px rgba(0,0,0,.05);margin:0}
+.tr-overview-mode .tr-row.on{border-color:#DB0074}
 .tr-row{padding:11px 14px;border-bottom:1px solid #F5F2EF;cursor:pointer;transition:background .1s;border-left:3px solid transparent}
 .tr-row:hover{background:#FAF8F6}
 .tr-row.on{background:rgba(219,0,116,.05);border-left-color:#DB0074}
@@ -676,8 +682,9 @@ body{
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"></path></svg>
       <span id="staff-indicator-name">（未設定）</span>
     </div>
-    <div class="glass-topnav-btn" id="handoff-btn" onclick="HO.openHandoff()" title="引継ぎメモ" style="position:relative">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4.5 19.5l.9-3.6L16 5.3a2 2 0 012.8 0l1.9 1.9a2 2 0 010 2.8L9.6 20.6 6 21.5z"></path></svg>
+    <div class="glass-topnav-btn" id="handoff-btn" onclick="HO.openHandoff()" title="引継ぎメモ" style="position:relative;display:flex;align-items:center;gap:5px;padding:0 12px">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4.5 19.5l.9-3.6L16 5.3a2 2 0 012.8 0l1.9 1.9a2 2 0 010 2.8L9.6 20.6 6 21.5z"></path></svg>
+      <span style="font-size:12px;font-weight:600">引継ぎ</span>
       <span id="handoff-pending-dot" style="display:none;width:7px;height:7px;border-radius:50%;background:#DB0074;position:absolute;top:5px;right:5px"></span>
     </div>
   </div>
@@ -8193,7 +8200,7 @@ const HO = {
           ${c.channel ? `<span style="font-size:10px;padding:1px 6px;background:var(--bg2);border:1px solid var(--border);border-radius:4px;color:var(--text3)">${c.channel}</span>` : ''}
           ${c.sub ? `<span style="font-size:11px;color:var(--text3)">${c.sub}</span>` : ''}
         </div>
-        <textarea id="ho-note-${i}" rows="2" placeholder="例：PATH Bを送信済み、お客様の返信待ち..." style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-size:12px;resize:none;outline:none;font-family:var(--font)"></textarea>
+        <textarea id="ho-note-${i}" rows="2" placeholder="例：返信メール送信済み、お客様の返信待ち中 / APN設定を案内、接続確認中..." style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-size:12px;resize:none;outline:none;font-family:var(--font)"></textarea>
       </div>`).join('');
     this._noteModalCases = cases;
     document.getElementById('ho-note-modal').classList.add('open');
@@ -8336,31 +8343,45 @@ const HO = {
       el.innerHTML = list.map(h => {
         const t = new Date(h.saved_at);
         const dateStr = `${t.getMonth()+1}/${t.getDate()} ${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}`;
-        const readBy = (h.read_by || []).join(', ');
+        const readBy = (h.read_by || []);
         const notes = (h.notes || []).filter(n => n.note);
-        const isUnread = !(h.read_by||[]).length;
+        const isUnread = !readBy.length;
         const age = Date.now() - new Date(h.saved_at).getTime();
         const isOverdue = isUnread && age > OVERDUE_MS;
-        const cardBorder = isOverdue ? '1px solid rgba(231,76,60,.5)' : '1px solid var(--border)';
-        const cardBg = isOverdue ? 'rgba(231,76,60,.05)' : 'var(--bg3)';
-        return `<div data-handoff-id="${h.id}" style="border:${cardBorder};border-radius:8px;padding:12px;margin-bottom:8px;background:${cardBg}">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-            <span style="font-weight:600;color:var(--accent)">${h.staff} <span style="font-size:11px;color:var(--text3);font-weight:400">${dateStr}</span>${isOverdue ? ' <span style="font-size:10px;color:#e74c3c;font-weight:700">⚠️ 2時間以上未確認</span>' : ''}</span>
-            <button onclick="HO.deleteHandoff('${h.id}')" style="font-size:11px;padding:2px 8px;border-radius:6px;border:1px solid var(--danger);color:var(--danger);background:transparent;cursor:pointer">🗑 削除</button>
+        const openCount = notes.filter(n => !resolvedIds.has(n.case_id)).length;
+        const doneCount = notes.filter(n => resolvedIds.has(n.case_id)).length;
+        return `<div data-handoff-id="${h.id}" style="border-radius:14px;margin-bottom:10px;background:var(--bg2);border:1.5px solid ${isOverdue?'#e74c3c':isUnread?'rgba(219,0,116,.25)':'var(--border)'};overflow:hidden">
+          <!-- Header -->
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:${isOverdue?'rgba(231,76,60,.07)':isUnread?'rgba(219,0,116,.04)':'transparent'};border-bottom:1px solid var(--border)">
+            <div style="width:32px;height:32px;border-radius:99px;background:var(--accent);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">${(h.staff||'?').charAt(0).toUpperCase()}</div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:13px;font-weight:700;color:var(--text)">${h.staff} <span style="font-size:11px;font-weight:400;color:var(--text3)">${dateStr}</span>${isOverdue?'<span style="font-size:10px;color:#e74c3c;font-weight:700;margin-left:6px">⚠️ 2時間以上未確認</span>':''}</div>
+              <div style="display:flex;gap:6px;margin-top:3px;flex-wrap:wrap">
+                ${openCount>0?`<span style="font-size:11px;padding:1px 8px;border-radius:99px;background:rgba(219,0,116,.1);color:var(--accent);font-weight:600">${openCount}件 対応中</span>`:''}
+                ${doneCount>0?`<span style="font-size:11px;padding:1px 8px;border-radius:99px;background:rgba(39,174,96,.1);color:#27ae60;font-weight:600">${doneCount}件 完了</span>`:''}
+                ${isUnread?`<span style="font-size:11px;padding:1px 8px;border-radius:99px;background:rgba(219,0,116,.12);color:var(--accent)">未確認</span>`:`<span style="font-size:11px;padding:1px 8px;border-radius:99px;background:rgba(39,174,96,.1);color:#27ae60">✓ ${readBy.join(', ')} が確認済</span>`}
+              </div>
+            </div>
+            <button onclick="HO.deleteHandoff('${h.id}')" style="font-size:11px;padding:3px 9px;border-radius:7px;border:1px solid var(--border);color:var(--text3);background:transparent;cursor:pointer;flex-shrink:0">削除</button>
           </div>
+          <!-- Case list -->
+          <div style="padding:8px 12px;display:flex;flex-direction:column;gap:6px">
           ${notes.length ? notes.map(n => {
             const isDone = resolvedIds.has(n.case_id);
-            return `<div style="font-size:12px;padding:6px 10px;background:var(--bg2);border-radius:6px;margin-bottom:4px;${isDone?'opacity:.5':''}">
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
-                ${isDone ? '<span style="color:var(--success);font-size:10px">✅ 完了</span>' : '<span style="color:var(--warning);font-size:10px">🔄 対応中</span>'}
-                <span style="color:var(--text2);font-weight:600">${n.customer_name || n.case_id}</span>
-                <span style="color:var(--text3)">[${n.channel || '—'}]</span>
+            return `<div style="display:flex;align-items:flex-start;gap:10px;padding:8px 10px;border-radius:9px;background:${isDone?'transparent':'var(--bg)'};border:1px solid ${isDone?'transparent':'var(--border-md)'};opacity:${isDone?.6:1}">
+              <div style="width:6px;height:6px;border-radius:50%;background:${isDone?'#27ae60':'var(--accent)'};margin-top:5px;flex-shrink:0"></div>
+              <div style="flex:1;min-width:0">
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap">
+                  <span style="font-size:12px;font-weight:600;color:var(--text)">${n.customer_name || n.case_id}</span>
+                  ${n.channel?`<span style="font-size:10px;padding:1px 6px;border-radius:4px;background:var(--bg3);color:var(--text3)">${n.channel}</span>`:''}
+                  <span style="font-size:10px;color:${isDone?'#27ae60':'var(--text3)'};font-weight:600">${isDone?'✅ 完了':'対応中'}</span>
+                </div>
+                <div style="font-size:12px;color:var(--text2);line-height:1.5">${n.note}</div>
+                ${!isDone?`<button onclick="HO.carryOver('${n.case_id}','${(n.customer_name||'').replace(/'/g,'')}','${n.channel||''}')" style="margin-top:5px;font-size:11px;padding:2px 10px;border-radius:6px;border:1px solid rgba(46,204,113,.4);color:#27ae60;background:transparent;cursor:pointer">➕ 自分の引継ぎに追加</button>`:''}
               </div>
-              <div style="color:var(--text)">${n.note}</div>
-              ${!isDone ? `<button onclick="HO.carryOver('${n.case_id}','${(n.customer_name||'').replace(/'/g,'')}','${n.channel||''}')" style="margin-top:4px;font-size:10px;padding:1px 8px;border-radius:4px;border:1px solid rgba(46,204,113,.4);color:#2ecc71;background:transparent;cursor:pointer">➕ 引継ぎに追加</button>` : ''}
             </div>`;
-          }).join('') : `<div style="font-size:12px;color:var(--text3);font-style:italic">メモなし</div>`}
-          ${readBy ? `<div style="font-size:11px;color:rgba(46,204,113,.6);margin-top:6px">✅ 確認済: ${readBy}</div>` : `<div style="font-size:11px;color:var(--text3);margin-top:6px">未確認</div>`}
+          }).join('') : `<div style="font-size:12px;color:var(--text3);font-style:italic;padding:4px 2px">メモなし</div>`}
+          </div>
         </div>`;
       }).join('');
       // Pagination controls
@@ -9061,8 +9082,16 @@ document.addEventListener('click', e => {
     });
     document.addEventListener('mousemove', e => {
       if (!dragging) return;
-      const newW = Math.max(180, Math.min(520, startW + (e.clientX - startX)));
+      const inbox = document.querySelector('.tr-inbox');
+      const maxW = inbox ? inbox.offsetWidth - 10 : window.innerWidth - 100;
+      const newW = Math.max(180, Math.min(maxW, startW + (e.clientX - startX)));
       listCol.style.width = newW + 'px';
+      // When list col is nearly full width → overview mode (hide detail, grid layout)
+      const overviewMode = newW > maxW * 0.72;
+      listCol.classList.toggle('tr-overview-mode', overviewMode);
+      document.getElementById('tr-resize-handle').style.display = overviewMode ? 'none' : '';
+      const detailCol = document.getElementById('tr-detail-col');
+      if (detailCol) detailCol.style.display = overviewMode ? 'none' : '';
     });
     document.addEventListener('mouseup', () => {
       if (!dragging) return;
@@ -9070,6 +9099,15 @@ document.addEventListener('click', e => {
       handle.classList.remove('dragging');
       document.body.style.userSelect = '';
       document.body.style.cursor = '';
+      // Restore handle/detail if not in overview mode
+      const inbox = document.querySelector('.tr-inbox');
+      const maxW = inbox ? inbox.offsetWidth - 10 : window.innerWidth - 100;
+      const overviewMode = listCol.offsetWidth > maxW * 0.72;
+      if (!overviewMode) {
+        document.getElementById('tr-resize-handle').style.display = '';
+        const detailCol = document.getElementById('tr-detail-col');
+        if (detailCol) detailCol.style.display = '';
+      }
     });
   }
   // wait for DOM
