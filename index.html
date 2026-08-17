@@ -8623,27 +8623,37 @@ const HO = {
         </div>
         <div style="font-size:14px;color:var(--text);white-space:pre-wrap;line-height:1.7">${note.replace(/\\n/g,'\n')}</div>
         <div style="margin-top:18px;text-align:right">
-          <button onclick="document.getElementById('_ho_note_overlay').remove();HO.closeBanner();setTimeout(()=>{const cards=document.querySelectorAll('.track-card');for(const c of cards){if((c.getAttribute('onclick')||'').includes('${caseId}')){const h=c.querySelector('[data-subject]');if(h)h.click();break;}}},100)" style="font-size:12px;padding:6px 18px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer;font-weight:600">💬 対応履歴を見る</button>
+          <button onclick="document.getElementById('_ho_note_overlay').remove();HO._openCase('${caseId}')" style="font-size:12px;padding:6px 18px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer;font-weight:600">💬 対応履歴を見る</button>
         </div>
       </div>`;
       m.addEventListener('click', e => { if (e.target === m) m.remove(); });
       document.body.appendChild(m);
     }
     // Scroll to card
+    HO.closeBanner();
     goPage('tracking', document.querySelector('.nav-item[onclick*="tracking"]'));
     setTimeout(() => {
+      // Find the row in new inbox layout
+      const row = document.querySelector(`.tr-row[data-trackid="${caseId}"]`);
+      if (row) {
+        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        row.click();
+        row.style.transition = 'outline .15s';
+        row.style.outline = '3px solid var(--accent)';
+        setTimeout(() => row.style.outline = '', 2000);
+        return;
+      }
+      // Fallback: old track-card layout
       const cards = document.querySelectorAll('.track-card');
       for (const card of cards) {
-        const onclick = card.getAttribute('onclick') || '';
-        if (onclick.includes(caseId)) {
+        if ((card.getAttribute('onclick') || '').includes(caseId)) {
           card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          card.style.transition = 'outline .1s';
           card.style.outline = '3px solid var(--accent)';
           setTimeout(() => card.style.outline = '', 2000);
           break;
         }
       }
-    }, 400);
+    }, 500);
   },
 
   _getActiveCases() {
@@ -9091,7 +9101,13 @@ loadData();
 loadTrackingFromSheet();
 CM.init();
 CT.init();
-setTimeout(() => { HO.checkBanner(); HO.startAutoCheck(); }, 1200);
+// Banner check triggered after name selection (in pw-gate script)
+// If already fully logged in (auth + name), trigger here
+setTimeout(() => {
+  const authed = localStorage.getItem('inplus_auth') === 'ganbarimasho';
+  const named = !!localStorage.getItem('inplus_staff_name');
+  if (authed && named) { HO.checkBanner(); HO.startAutoCheck(); }
+}, 1200);
 
 // ESC closes any open modal
 document.addEventListener('keydown', e => {
@@ -9122,45 +9138,113 @@ document.addEventListener('click', e => {
 
 <!-- Password Gate -->
 <div id="pw-gate" style="display:none;position:fixed;inset:0;z-index:99999;background:#0d1b2a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px">
-  <div style="text-align:center;margin-bottom:8px">
-    <div style="font-size:36px;margin-bottom:12px">🔑</div>
-    <div style="color:#e8eef5;font-size:20px;font-weight:600;font-family:'Noto Sans JP',sans-serif">おかえり！</div>
-    <div style="color:#7a99b8;font-size:13px;margin-top:8px;font-family:'Noto Sans JP',sans-serif">ツールを開く前にパスワードを入れてね</div>
+  <!-- Step 1: Password -->
+  <div id="pw-step1" style="display:flex;flex-direction:column;align-items:center;gap:20px">
+    <div style="text-align:center">
+      <div style="font-size:36px;margin-bottom:12px">🔑</div>
+      <div style="color:#e8eef5;font-size:20px;font-weight:600;font-family:'Noto Sans JP',sans-serif">おかえり！</div>
+      <div style="color:#7a99b8;font-size:13px;margin-top:8px;font-family:'Noto Sans JP',sans-serif">ツールを開く前にパスワードを入れてね</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <input id="pw-input" type="password" placeholder="パスワード"
+        style="padding:10px 16px;border-radius:10px;border:1px solid #243d57;background:#152336;color:#e8eef5;font-size:15px;width:220px;outline:none;font-family:'Noto Sans JP',sans-serif"
+        onkeydown="if(event.key==='Enter')checkPw()">
+      <button onclick="checkPw()" style="padding:10px 20px;border-radius:10px;background:#f04e8c;color:#fff;border:none;font-size:14px;font-weight:600;cursor:pointer;font-family:'Noto Sans JP',sans-serif">入る</button>
+    </div>
+    <div id="pw-error" style="color:#e74c3c;font-size:13px;display:none;font-family:'Noto Sans JP',sans-serif">❌ パスワードが違います</div>
   </div>
-  <div style="display:flex;gap:8px;align-items:center">
-    <input id="pw-input" type="password" placeholder="パスワード"
-      style="padding:10px 16px;border-radius:10px;border:1px solid #243d57;background:#152336;color:#e8eef5;font-size:15px;width:220px;outline:none;font-family:'Noto Sans JP',sans-serif"
-      onkeydown="if(event.key==='Enter')checkPw()">
-    <button onclick="checkPw()"
-      style="padding:10px 20px;border-radius:10px;background:#f04e8c;color:#fff;border:none;font-size:14px;font-weight:600;cursor:pointer;font-family:'Noto Sans JP',sans-serif">
-      入る
-    </button>
+  <!-- Step 2: Name selection -->
+  <div id="pw-step2" style="display:none;flex-direction:column;align-items:center;gap:16px">
+    <div style="text-align:center">
+      <div style="font-size:36px;margin-bottom:12px">👤</div>
+      <div style="color:#e8eef5;font-size:20px;font-weight:600;font-family:'Noto Sans JP',sans-serif">あなたは誰？</div>
+      <div style="color:#7a99b8;font-size:13px;margin-top:8px;font-family:'Noto Sans JP',sans-serif">名前を選んでください</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;width:240px" id="pw-name-list"></div>
+    <div style="display:flex;gap:8px;align-items:center;width:240px">
+      <input id="pw-name-input" type="text" placeholder="新しい名前を追加..."
+        style="flex:1;padding:9px 14px;border-radius:10px;border:1px solid #243d57;background:#152336;color:#e8eef5;font-size:14px;outline:none;font-family:'Noto Sans JP',sans-serif"
+        onkeydown="if(event.key==='Enter')addAndSelectName()">
+      <button onclick="addAndSelectName()" style="padding:9px 14px;border-radius:10px;background:#243d57;color:#e8eef5;border:none;font-size:13px;font-weight:600;cursor:pointer">追加</button>
+    </div>
   </div>
-  <div id="pw-error" style="color:#e74c3c;font-size:13px;display:none;font-family:'Noto Sans JP',sans-serif">❌ パスワードが違います</div>
 </div>
 <script>
 (function(){
   const PW = 'ganbarimasho';
   const KEY = 'inplus_auth';
+  const NAME_KEY = 'inplus_staff_name';
+  const NAMES_KEY = 'inplus_staff_list';
+  const DEFAULT_NAMES = ['キム','イズ','チャック','ゾーイ'];
   const gate = document.getElementById('pw-gate');
-  if(localStorage.getItem(KEY) === PW){
-    gate.style.display = 'none';
-  } else {
-    gate.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
+
+  function getNames() {
+    try { const n = JSON.parse(localStorage.getItem(NAMES_KEY)||'null'); if(Array.isArray(n)&&n.length) return n; } catch(e){}
+    return [...DEFAULT_NAMES];
   }
-  window.checkPw = function(){
+
+  function selectName(name) {
+    localStorage.setItem(NAME_KEY, name);
+    const ind = document.getElementById('staff-indicator-name');
+    if (ind) ind.textContent = name;
+    const tb = document.getElementById('tb-staff-name');
+    if (tb) tb.textContent = name;
+    gate.style.display = 'none';
+    document.body.style.overflow = '';
+    // Trigger banner check after login
+    setTimeout(() => { if(typeof HO !== 'undefined') { HO.checkBanner(); HO.startAutoCheck(); } }, 800);
+  }
+
+  function renderNameList() {
+    const names = getNames();
+    const el = document.getElementById('pw-name-list');
+    if (!el) return;
+    el.innerHTML = names.map(n => `<button onclick="selectName('${n}')"
+      style="padding:12px 16px;border-radius:10px;border:1px solid #243d57;background:#152336;color:#e8eef5;font-size:15px;font-weight:600;cursor:pointer;font-family:'Noto Sans JP',sans-serif;text-align:left;transition:background .15s"
+      onmouseover="this.style.background='#1f3550'" onmouseout="this.style.background='#152336'">${n}</button>`).join('');
+  }
+
+  window.addAndSelectName = function() {
+    const inp = document.getElementById('pw-name-input');
+    const name = inp.value.trim();
+    if (!name) return;
+    const names = getNames();
+    if (!names.includes(name)) { names.push(name); localStorage.setItem(NAMES_KEY, JSON.stringify(names)); }
+    selectName(name);
+  };
+
+  window.selectName = selectName;
+  window.checkPw = function() {
     const val = document.getElementById('pw-input').value;
-    if(val === PW){
+    if (val === PW) {
       localStorage.setItem(KEY, PW);
-      gate.style.display = 'none';
-      document.body.style.overflow = '';
+      document.getElementById('pw-step1').style.display = 'none';
+      document.getElementById('pw-step2').style.display = 'flex';
+      renderNameList();
+      setTimeout(() => document.getElementById('pw-name-input')?.focus(), 100);
     } else {
       document.getElementById('pw-error').style.display = 'block';
       document.getElementById('pw-input').value = '';
       document.getElementById('pw-input').focus();
     }
   };
+
+  // Already authenticated — check if name is set
+  if (localStorage.getItem(KEY) === PW) {
+    if (localStorage.getItem(NAME_KEY)) {
+      gate.style.display = 'none';
+    } else {
+      // Auth OK but no name → show name step
+      gate.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      document.getElementById('pw-step1').style.display = 'none';
+      document.getElementById('pw-step2').style.display = 'flex';
+      renderNameList();
+    }
+  } else {
+    gate.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
 })();
 </script>
 
