@@ -676,7 +676,7 @@ body{
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"></path></svg>
       <span id="staff-indicator-name">（未設定）</span>
     </div>
-    <div class="glass-topnav-btn" onclick="HO.openHandoff()" title="引継ぎメモ" style="position:relative">
+    <div class="glass-topnav-btn" id="handoff-btn" onclick="HO.openHandoff()" title="引継ぎメモ" style="position:relative">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4.5 19.5l.9-3.6L16 5.3a2 2 0 012.8 0l1.9 1.9a2 2 0 010 2.8L9.6 20.6 6 21.5z"></path></svg>
       <span id="handoff-pending-dot" style="display:none;width:7px;height:7px;border-radius:50%;background:#DB0074;position:absolute;top:5px;right:5px"></span>
     </div>
@@ -6033,6 +6033,9 @@ function openTrackingDetail(t) {
   const deleteBtn = t.row
     ? `<button onclick="if(confirm('削除しますか？'))deleteSheetRow(${t.row},this)" style="font-size:12px;padding:5px 10px;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--text3);cursor:pointer">🗑️</button>`
     : t.local ? `<button onclick="deleteTracking('${t.id}')" style="font-size:12px;padding:5px 10px;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--text3);cursor:pointer">🗑️</button>` : '';
+  const handoffBtn = !isDone
+    ? `<button onclick="HO.carryOver('${trackingId}','${(t.question||'').replace(/'/g,'').substring(0,40)}','${t.channel||''}')" style="font-size:12px;padding:5px 13px;background:transparent;border:1px solid #27ae60;border-radius:8px;color:#27ae60;cursor:pointer;font-weight:600">🔖 引継ぎ</button>`
+    : '';
 
   // Yahoo/Gmail banners
   const notes = t.notes || '';
@@ -6110,7 +6113,7 @@ function openTrackingDetail(t) {
       <div class="tr-det-top">
         <div class="tr-det-title">${(t.question||'（件名なし）').replace(/</g,'&lt;')}</div>
         <div style="display:flex;gap:6px;flex-shrink:0;align-items:center">
-          ${doneBtn}${escBtn}${deleteBtn}
+          ${doneBtn}${escBtn}${handoffBtn}${deleteBtn}
         </div>
       </div>
       <div class="tr-det-meta">
