@@ -600,12 +600,17 @@ body{
 .tr-search-icon{position:absolute;left:20px;top:50%;transform:translateY(-50%);color:#B0ABA6;font-size:13px;pointer-events:none}
 /* List rows */
 .tr-list-scroll{flex:1;overflow-y:auto}
-/* Overview mode: list col expands full, cards go grid */
-.tr-overview-mode{width:100%!important;border-right:none!important}
+/* Overview mode: list col expands, cards go grid */
+.tr-overview-mode{border-right:none!important}
 .tr-overview-mode .tr-list-scroll{overflow-y:auto}
 .tr-overview-mode #tracking-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;padding:12px}
 .tr-overview-mode .tr-row{border-bottom:none;border-radius:12px;border:1px solid #F0EDE9;box-shadow:0 1px 6px rgba(0,0,0,.05);margin:0}
 .tr-overview-mode .tr-row.on{border-color:#DB0074}
+/* Collapsed detail strip */
+.tr-detail-collapsed{width:32px!important;min-width:32px!important;flex:none!important;overflow:hidden;cursor:pointer;display:flex!important;align-items:center;justify-content:center;background:#F5F2EF;border-left:1px solid #E8E3DE;transition:none}
+.tr-detail-collapsed>*:not(.tr-detail-restore-hint){display:none!important}
+.tr-detail-restore-hint{display:flex;flex-direction:column;align-items:center;gap:6px;color:#B0A89E;font-size:10px;writing-mode:vertical-rl;letter-spacing:.05em;padding:12px 0;user-select:none}
+.tr-detail-restore-hint svg{transform:rotate(180deg)}
 .tr-row{padding:11px 14px;border-bottom:1px solid #F5F2EF;cursor:pointer;transition:background .1s;border-left:3px solid transparent}
 .tr-row:hover{background:#FAF8F6}
 .tr-row.on{background:rgba(219,0,116,.05);border-left-color:#DB0074}
@@ -682,7 +687,7 @@ body{
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"></path></svg>
       <span id="staff-indicator-name">（未設定）</span>
     </div>
-    <div class="glass-topnav-btn" id="handoff-btn" onclick="HO.openHandoff()" title="引継ぎメモ" style="position:relative;display:flex;align-items:center;gap:5px;padding:0 12px">
+    <div class="glass-topnav-btn" id="handoff-btn" onclick="HO.openModal()" title="引継ぎ" style="position:relative;display:flex;align-items:center;gap:5px;padding:0 12px">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4.5 19.5l.9-3.6L16 5.3a2 2 0 012.8 0l1.9 1.9a2 2 0 010 2.8L9.6 20.6 6 21.5z"></path></svg>
       <span style="font-size:12px;font-weight:600">引継ぎ</span>
       <span id="handoff-pending-dot" style="display:none;width:7px;height:7px;border-radius:50%;background:#DB0074;position:absolute;top:5px;right:5px"></span>
@@ -1634,6 +1639,10 @@ body{
 
     <!-- Right: detail -->
     <div class="tr-detail-col" id="tr-detail-col">
+      <div class="tr-detail-restore-hint" onclick="(function(){const lc=document.querySelector('.tr-list-col'),dc=document.getElementById('tr-detail-col');lc.style.width='280px';lc.classList.remove('tr-overview-mode');dc.classList.remove('tr-detail-collapsed');document.getElementById('tr-resize-handle').style.opacity=''})()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+        <span>内容を表示</span>
+      </div>
       <div class="tr-detail-empty">
         <div style="font-size:36px">💬</div>
         <div>案件を選択してください</div>
@@ -1796,35 +1805,35 @@ body{
 
 <!-- #8 HANDOFF MODAL -->
 <div class="cm-modal" id="handoff-modal" onclick="if(event.target===this)HO.closeHandoff()">
-  <div class="cm-box" style="max-width:600px">
-    <div class="cm-header" style="display:flex;align-items:center;justify-content:space-between">
-      <div style="display:flex;gap:12px;align-items:center">
-        <span id="handoff-modal-title">📝 引継ぎメモを作成</span>
-        <div style="display:flex;gap:4px">
-          <button id="ho-tab-create" onclick="HO.switchTab('create')" style="font-size:12px;padding:3px 10px;border-radius:6px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer">作成</button>
-          <button id="ho-tab-history" onclick="HO.switchTab('history')" style="font-size:12px;padding:3px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer">履歴</button>
-        </div>
-      </div>
-      <button onclick="HO.closeHandoff()" style="background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;line-height:1">×</button>
+  <div class="cm-box" style="max-width:860px;width:96vw;padding:0;overflow:hidden;border-radius:20px">
+    <!-- Top bar -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px 0">
+      <span style="font-size:15px;font-weight:700">🔖 引継ぎ</span>
+      <button onclick="HO.closeHandoff()" style="background:none;border:none;color:var(--text3);font-size:22px;cursor:pointer;line-height:1">×</button>
     </div>
-    <div style="padding:16px">
-      <div id="handoff-tab-create" style="display:flex;flex-direction:column;height:100%">
-        <div id="handoff-cases-list" style="overflow-y:auto;max-height:55vh;padding-right:4px"></div>
-        <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;flex-shrink:0">
-          <button class="btn btn-ghost" onclick="HO.closeHandoff()">キャンセル</button>
-          <button class="btn btn-primary" onclick="HO.saveHandoff()">💾 引継ぎを保存</button>
+    <!-- 2-panel horizontal layout -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;min-height:420px">
+      <!-- Left: 作成 -->
+      <div style="display:flex;flex-direction:column;padding:14px 16px 16px;border-right:1px solid var(--border)">
+        <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">✏️ 新しく引継ぎを作成</div>
+        <div id="handoff-cases-list" style="flex:1;overflow-y:auto;max-height:340px;padding-right:4px"></div>
+        <div style="padding-top:12px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;flex-shrink:0;margin-top:10px">
+          <button class="btn btn-ghost" onclick="HO.enterSelectMode()">＋ ケースを選択</button>
+          <button class="btn btn-primary" onclick="HO.saveHandoff()">💾 保存する</button>
         </div>
       </div>
-      <div id="handoff-tab-history" style="display:none">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:6px;flex-wrap:wrap">
-          <div style="display:flex;gap:4px;flex-wrap:wrap">
-            <button id="ho-filter-all"    onclick="HO.setFilter('all')"         style="font-size:11px;padding:2px 10px;border-radius:6px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer">全て</button>
-            <button id="ho-filter-unread" onclick="HO.setFilter('unread')"      style="font-size:11px;padding:2px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer">未確認</button>
-            <button id="ho-filter-active" onclick="HO.setFilter('active')"      style="font-size:11px;padding:2px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer">対応中</button>
+      <!-- Right: 履歴 -->
+      <div style="display:flex;flex-direction:column;padding:14px 16px 16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em">📋 引継ぎ履歴</div>
+          <div style="display:flex;gap:4px;align-items:center">
+            <button id="ho-filter-all"    onclick="HO.setFilter('all')"    style="font-size:11px;padding:2px 9px;border-radius:6px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer">全て</button>
+            <button id="ho-filter-unread" onclick="HO.setFilter('unread')" style="font-size:11px;padding:2px 9px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer">未確認</button>
+            <button id="ho-filter-active" onclick="HO.setFilter('active')" style="font-size:11px;padding:2px 9px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer">対応中</button>
+            <button onclick="HO.deleteAllHandoff()" style="font-size:11px;padding:2px 8px;border-radius:6px;border:1px solid var(--danger);color:var(--danger);background:transparent;cursor:pointer">🗑</button>
           </div>
-          <button onclick="HO.deleteAllHandoff()" style="font-size:11px;padding:3px 10px;border-radius:6px;border:1px solid var(--danger);color:var(--danger);background:transparent;cursor:pointer">🗑 全て削除</button>
         </div>
-        <div id="handoff-history-list" style="max-height:360px;overflow-y:auto"></div>
+        <div id="handoff-history-list" style="flex:1;overflow-y:auto;max-height:360px"></div>
       </div>
     </div>
   </div>
@@ -8130,24 +8139,56 @@ const HO = {
   KEY: 'inplus_last_handoff',
   BANNER_TTL: 24 * 60 * 60 * 1000, // 24 hours
 
-  openHandoff() {
-    // Toggle handoff mode
+  openModal() {
+    // Just open the popup — load both panels
+    if (!SHEET_TRACKING.length) {
+      loadTrackingFromSheet().then(() => this.openModal());
+      return;
+    }
+    document.getElementById('handoff-modal').classList.add('open');
+    this._renderCreatePanel();
+    this.loadHistory(0);
+  },
+
+  _renderCreatePanel() {
+    const el = document.getElementById('handoff-cases-list');
+    if (!el) return;
+    const sel = this._selectedCases || {};
+    const keys = Object.keys(sel);
+    if (!keys.length) {
+      el.innerHTML = `<div style="text-align:center;padding:24px 0;color:var(--text3);font-size:13px">「ケースを選択」ボタンで<br>引継ぎするケースを選んでください</div>`;
+      return;
+    }
+    el.innerHTML = keys.map((caseId, i) => {
+      const n = sel[caseId];
+      return `<div style="margin-bottom:10px;border:1px solid var(--border);border-radius:10px;padding:10px 12px;background:var(--bg3)">
+        <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:6px">${n.label || caseId}<span style="font-size:11px;color:var(--text3);margin-left:6px">[${n.channel||''}]</span></div>
+        <textarea id="ho-note-${i}" data-caseid="${caseId}" rows="2" placeholder="例：返信メール送信済み、お客様の返信待ち中 / APN設定を案内、接続確認中..." style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-size:12px;resize:none;outline:none;font-family:var(--font);box-sizing:border-box">${n.note||''}</textarea>
+      </div>`;
+    }).join('');
+  },
+
+  enterSelectMode() {
+    document.getElementById('handoff-modal').classList.remove('open');
     if (this._hoMode) { this.exitHandoffMode(); return; }
     if (!SHEET_TRACKING.length) {
-      loadTrackingFromSheet().then(() => this.openHandoff());
+      loadTrackingFromSheet().then(() => this.enterSelectMode());
       return;
     }
     goPage('tracking', document.querySelector('.nav-item[onclick*="tracking"]'));
     this._hoMode = true;
-    this._selectedCases = {};
+    this._selectedCases = this._selectedCases || {};
     document.getElementById('tracking-list').classList.add('ho-mode');
     document.getElementById('ho-mode-banner').style.display = 'block';
     document.getElementById('handoff-btn').classList.add('on');
     renderTracking();
     this._updateFloatingBar();
-    // ESC to exit
     this._escHandler = (e) => { if (e.key === 'Escape') this.exitHandoffMode(); };
     document.addEventListener('keydown', this._escHandler);
+  },
+
+  openHandoff() {
+    this.openModal();
   },
 
   openHistory() {
@@ -8165,6 +8206,8 @@ const HO = {
     document.getElementById('handoff-btn').classList.remove('on');
     if (this._escHandler) { document.removeEventListener('keydown', this._escHandler); this._escHandler = null; }
     renderTracking();
+    // Re-open modal so user can write notes and save
+    setTimeout(() => this.openModal(), 100);
   },
 
   toggleCard(el, caseId, label, channel, sub) {
@@ -8211,13 +8254,21 @@ const HO = {
   },
 
   async saveHandoff() {
-    const cases = this._noteModalCases || [];
-    const notes = cases.map((c, i) => ({
-      case_id: c.caseId,
-      customer_name: c.label || '—',
-      channel: c.channel || '',
-      note: document.getElementById(`ho-note-${i}`)?.value.trim() || ''
-    }));
+    const sel = this._selectedCases || {};
+    const textareas = document.querySelectorAll('#handoff-cases-list textarea[data-caseid]');
+    const notes = [];
+    if (textareas.length) {
+      textareas.forEach(ta => {
+        const caseId = ta.dataset.caseid;
+        const c = sel[caseId] || {};
+        notes.push({ case_id: caseId, customer_name: c.label || '—', channel: c.channel || '', note: ta.value.trim() });
+      });
+    } else {
+      // fallback legacy
+      (this._noteModalCases || []).forEach((c, i) => {
+        notes.push({ case_id: c.caseId, customer_name: c.label || '—', channel: c.channel || '', note: document.getElementById(`ho-note-${i}`)?.value.trim() || '' });
+      });
+    }
     if (!notes.some(n => n.note)) {
       showToast('⚠️ 少なくとも1件メモを入力してください');
       return;
@@ -8228,7 +8279,10 @@ const HO = {
       notes
     };
     document.getElementById('ho-note-modal').classList.remove('open');
-    this.exitHandoffMode();
+    this._hoMode = false;
+    this._selectedCases = {};
+    document.getElementById('handoff-btn').classList.remove('on');
+    this.closeHandoff();
     document.getElementById('handoff-pending-dot').style.display = 'none';
     // Flash handoff cases in tracking list
     this._handoffCaseIds = new Set(notes.filter(n => n.note).map(n => n.case_id));
@@ -8374,6 +8428,7 @@ const HO = {
                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap">
                   <span style="font-size:12px;font-weight:600;color:var(--text)">${n.customer_name || n.case_id}</span>
                   ${n.channel?`<span style="font-size:10px;padding:1px 6px;border-radius:4px;background:var(--bg3);color:var(--text3)">${n.channel}</span>`:''}
+                  ${(()=>{const tr=SHEET_TRACKING.find(t=>n.case_id===`tracking-${t.row}`||n.case_id===t.id);return tr&&tr.iccid?`<span style="font-size:10px;padding:1px 8px;border-radius:4px;background:#EEF4FF;color:#2563EB;font-weight:700;font-family:monospace;letter-spacing:.02em">📶 ${tr.iccid}</span>`:''})()}
                   <span style="font-size:10px;color:${isDone?'#27ae60':'var(--text3)'};font-weight:600">${isDone?'✅ 完了':'対応中'}</span>
                 </div>
                 <div style="font-size:12px;color:var(--text2);line-height:1.5">${n.note}</div>
@@ -9086,12 +9141,12 @@ document.addEventListener('click', e => {
       const maxW = inbox ? inbox.offsetWidth - 10 : window.innerWidth - 100;
       const newW = Math.max(180, Math.min(maxW, startW + (e.clientX - startX)));
       listCol.style.width = newW + 'px';
-      // When list col is nearly full width → overview mode (hide detail, grid layout)
+      // When list col is nearly full width → overview mode (collapse detail to strip)
       const overviewMode = newW > maxW * 0.72;
       listCol.classList.toggle('tr-overview-mode', overviewMode);
-      document.getElementById('tr-resize-handle').style.display = overviewMode ? 'none' : '';
       const detailCol = document.getElementById('tr-detail-col');
-      if (detailCol) detailCol.style.display = overviewMode ? 'none' : '';
+      if (detailCol) detailCol.classList.toggle('tr-detail-collapsed', overviewMode);
+      document.getElementById('tr-resize-handle').style.opacity = overviewMode ? '0' : '';
     });
     document.addEventListener('mouseup', () => {
       if (!dragging) return;
@@ -9099,15 +9154,6 @@ document.addEventListener('click', e => {
       handle.classList.remove('dragging');
       document.body.style.userSelect = '';
       document.body.style.cursor = '';
-      // Restore handle/detail if not in overview mode
-      const inbox = document.querySelector('.tr-inbox');
-      const maxW = inbox ? inbox.offsetWidth - 10 : window.innerWidth - 100;
-      const overviewMode = listCol.offsetWidth > maxW * 0.72;
-      if (!overviewMode) {
-        document.getElementById('tr-resize-handle').style.display = '';
-        const detailCol = document.getElementById('tr-detail-col');
-        if (detailCol) detailCol.style.display = '';
-      }
     });
   }
   // wait for DOM
