@@ -6874,34 +6874,37 @@ function buildTemplate() {
                       t.channel.split(',').map(c => c.trim()).includes(S.ch);
       return caseMatch && chMatch;
     });
-    const tmpl = matches.length > 0 ? matches[0] : TMPL_DATA.find(t => t.case_id === S.case);
-    if (tmpl) {
-      let body = tmpl.template_jp
-        .replace(/{{name}}/g, d.name || '〇〇')
-        .replace(/{{genjou}}/g, d.genjou || '')
-        .replace(/{{note}}/g, d.note || '〇〇年〇月〇日 〇〇:〇〇（日本時間）');
-      if (body.includes('{{quote}}')) {
-        body = body.replace(/{{quote}}/g, d.quote || '');
-      } else if (d.quote && S.ch !== 'LINE') {
-        const marker = 'ご返答させて頂きたく思っております。';
-        if (body.includes(marker)) {
-          body = body.replace(new RegExp(marker.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\s*'), marker + '\n＞' + d.quote + '\n→');
+    // For LINE: T object has LINE-specific short content — use it when available
+    if (S.ch === 'LINE') {
+      const fn = T[S.case];
+      if (fn) text = fn(d) || '';
+    }
+    if (!text) {
+      const tmpl = matches.length > 0 ? matches[0] : TMPL_DATA.find(t => t.case_id === S.case);
+      if (tmpl) {
+        let body = tmpl.template_jp
+          .replace(/{{name}}/g, d.name || '〇〇')
+          .replace(/{{genjou}}/g, d.genjou || '')
+          .replace(/{{note}}/g, d.note || '〇〇年〇月〇日 〇〇:〇〇（日本時間）');
+        if (body.includes('{{quote}}')) {
+          body = body.replace(/{{quote}}/g, d.quote || '');
+        } else if (d.quote && S.ch !== 'LINE') {
+          const marker = 'ご返答させて頂きたく思っております。';
+          if (body.includes(marker)) {
+            body = body.replace(new RegExp(marker.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\s*'), marker + '\n＞' + d.quote + '\n→');
+          }
         }
-      }
-      if (S.ch === 'LINE') {
-        // TMPL_DATA templates embed Amazon/generic headers & footers — strip them for LINE
-        // 1. Remove header up to "ご返答させて頂きたく思っております。"
-        body = body.replace(/^[\s\S]*?ご返答させて頂きたく思っております。\s*\n*/,'');
-        // 2. Remove quote indicator line (＞ or >) and response prefix (→)
-        body = body.replace(/^[＞>][^\n]*\n[→]?\s*/,'');
-        // 3. Remove company name from footer
-        body = body
-          .replace(/\n今後ともどうぞよろしくお願いいたします。\nイン・プラスサポートセンター$/,'')
-          .replace(/\n今後ともどうぞよろしくお願いいたします。$/,'');
-        text = base() + (body.trim() ? '\n\n' + body.trim() : '') + footer();
-      } else {
-        // Normalize: remove extra blank lines before ＞ and →
-        text = body.replace(/\n\n(＞)/g, '\n$1').replace(/\n\n(→)/g, '\n$1');
+        if (S.ch === 'LINE') {
+          // T object didn't cover this case — strip Amazon/generic header+footer from TMPL_DATA
+          body = body.replace(/^[\s\S]*?ご返答させて頂きたく思っております。\s*\n*/,'');
+          body = body.replace(/^[＞>][^\n]*\n[→]?\s*/,'');
+          body = body
+            .replace(/\n今後ともどうぞよろしくお願いいたします。\nイン・プラスサポートセンター$/,'')
+            .replace(/\n今後ともどうぞよろしくお願いいたします。$/,'');
+          text = base() + (body.trim() ? '\n\n' + body.trim() : '') + footer();
+        } else {
+          text = body.replace(/\n\n(＞)/g, '\n$1').replace(/\n\n(→)/g, '\n$1');
+        }
       }
     }
   }
