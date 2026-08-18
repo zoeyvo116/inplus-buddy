@@ -2862,6 +2862,21 @@ function buildSetteiTmpl(d){
     return out;
   }
 
+  // ── Released（未インストール） ──
+  if(path==='not_installed'){
+    const apnLine = av && av!=='[APN]' ? `\n\n【Androidの場合のAPN設定】\nAPN名：${av}` : '';
+    out +=
+      `\nお客様のeSIM状況を確認いたしましたところ、eSIMがまだ端末にインストールされていない状態となっております。\n\n`+
+      `まず以下の手順でeSIMをインストールいただく必要がございます。\n\n`+
+      `【iPhoneの場合】\n設定 → モバイル通信 → 「＋」またはモバイル通信プランを追加 → QRコードを使用\n\n`+
+      `【Androidの場合】\n設定 → ネットワークとインターネット → SIM → SIMを追加 → QRコードをスキャン`+
+      `${apnLine}\n\n`+
+      `インストール完了後、渡航先にてeSIMを選択し、データローミングをONにしていただくとご利用いただけます。\n\n`+
+      `ご不明な点がございましたら、お気軽にご連絡ください😊`;
+    out += footer();
+    return out;
+  }
+
   const allItems = path==='A' ? SETTEI_A : SETTEI_B;
   const nums=['①','②','③','④','⑤'];
   const screenshotSuffix = `\n\n───────────────────────\n上記をお試しいただいても改善しない場合は、以下の設定画面のスクリーンショットをお送りいただけますでしょうか。\n${buildScreenshotList(path)}`;
@@ -4438,6 +4453,9 @@ function parseB2B(raw){
     p.status = 'インストール済み・有効化された' + (ts ? '（'+ts[1]+'）' : statusRaw ? '（'+statusRaw.replace(/^Installed\s*-\s*/,'').trim()+'）' : '');
   } else if(text.includes('未インストール')||text.includes('QRコード未生成')){
     p.status='QRコード未生成';p.path=null;
+  } else if(statusRaw.toLowerCase().includes('released')||text.includes('ダウンロードされていない')){
+    p.path='not_installed';
+    p.status='Released（未ダウンロード・未インストール）';
   }
 
   // ── Device Model (機種名) ──
@@ -4800,6 +4818,7 @@ function swProcessB2b(raw){
   wrap.style.display='block';
   if(p.path==='A') badge.innerHTML='<span class="path-badge path-a">⚡ PATH A — 無効化（圏外）</span>';
   else if(p.path==='B') badge.innerHTML='<span class="path-badge path-b">✅ PATH B — 有効化（電波あり・繋がらない）</span>';
+  else if(p.path==='not_installed') badge.innerHTML='<span class="path-badge path-warn">📥 未インストール（Released — まずeSIMをインストールが必要）</span>';
   else if(p.status==='QRコード未生成') badge.innerHTML='<span class="path-badge path-warn">⚠️ 未インストール（QRコード未生成）</span>';
   else if(p.plan||p.iccid) badge.innerHTML='<span class="path-badge path-unknown">🔍 ステータス未検出</span>';
   else badge.innerHTML='<span class="path-badge path-unknown">📋 B2Bのテキストを貼り付けてください</span>';
@@ -4823,7 +4842,13 @@ function swProcessB2b(raw){
       swHideEl('sw-s5');
       swHandleEsimDeleted();
     } else {
-      if(p.path){swEl('sw-topic-wrap').style.display='block';swRenderSubQChips(p.path);}
+      if(p.path==='not_installed'){
+        // eSIM not installed — skip sub-Q, template auto-generated
+        swEl('sw-topic-wrap').style.display='none';
+        showToast('📥 eSIM未インストール — インストール案内テンプレートを生成しました');
+      } else if(p.path){
+        swEl('sw-topic-wrap').style.display='block';swRenderSubQChips(p.path);
+      }
       if(S.ch==='LINE'){
         if(p.device){
           // device already known from B2B → skip デバイス確認 box, auto-set
