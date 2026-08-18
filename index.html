@@ -9206,7 +9206,7 @@ CT.init();
 // Banner check triggered after name selection (in pw-gate script)
 // If already fully logged in (auth + name), trigger here
 setTimeout(() => {
-  const authed = (localStorage.getItem('inplus_auth') || '').startsWith('google:');
+  const authed = localStorage.getItem('inplus_auth') === 'ganbarimasho';
   const named = !!localStorage.getItem('inplus_staff_name');
   if (authed && named) { HO.checkBanner(); HO.startAutoCheck(); }
 }, 1200);
@@ -9240,15 +9240,20 @@ document.addEventListener('click', e => {
 
 <!-- Password Gate -->
 <div id="pw-gate" style="display:none;position:fixed;inset:0;z-index:99999;background:#0d1b2a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px">
-  <!-- Step 1: Google Sign-In -->
+  <!-- Step 1: Password -->
   <div id="pw-step1" style="display:flex;flex-direction:column;align-items:center;gap:20px">
     <div style="text-align:center">
       <div style="font-size:36px;margin-bottom:12px">🔑</div>
       <div style="color:#e8eef5;font-size:20px;font-weight:600;font-family:'Noto Sans JP',sans-serif">おかえり！</div>
-      <div style="color:#7a99b8;font-size:13px;margin-top:8px;font-family:'Noto Sans JP',sans-serif">Googleアカウントでログインしてください</div>
+      <div style="color:#7a99b8;font-size:13px;margin-top:8px;font-family:'Noto Sans JP',sans-serif">ツールを開く前にパスワードを入れてね</div>
     </div>
-    <div id="google-signin-btn"></div>
-    <div id="pw-error" style="color:#e74c3c;font-size:13px;display:none;font-family:'Noto Sans JP',sans-serif">❌ @in-plus.co.jpのアカウントのみ利用可能です</div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <input id="pw-input" type="password" placeholder="パスワード"
+        style="padding:10px 16px;border-radius:10px;border:1px solid #243d57;background:#152336;color:#e8eef5;font-size:15px;width:220px;outline:none;font-family:'Noto Sans JP',sans-serif"
+        onkeydown="if(event.key==='Enter')checkPw()">
+      <button onclick="checkPw()" style="padding:10px 20px;border-radius:10px;background:#f04e8c;color:#fff;border:none;font-size:14px;font-weight:600;cursor:pointer;font-family:'Noto Sans JP',sans-serif">入る</button>
+    </div>
+    <div id="pw-error" style="color:#e74c3c;font-size:13px;display:none;font-family:'Noto Sans JP',sans-serif">❌ パスワードが違います</div>
   </div>
   <!-- Step 2: Name selection -->
   <div id="pw-step2" style="display:none;flex-direction:column;align-items:center;gap:16px">
@@ -9268,8 +9273,7 @@ document.addEventListener('click', e => {
 </div>
 <script>
 (function(){
-  const GOOGLE_CLIENT_ID = '809272847131-mrb1dqtk0nkigbei7dmchimind22u56r.apps.googleusercontent.com';
-  const ALLOWED_DOMAIN = 'in-plus.co.jp';
+  const PW = 'ganbarimasho';
   const KEY = 'inplus_auth';
   const NAME_KEY = 'inplus_staff_name';
   const NAMES_KEY = 'inplus_staff_list';
@@ -9318,38 +9322,22 @@ document.addEventListener('click', e => {
   };
 
   window.selectName = selectName;
-
-  function handleGoogleCredential(response) {
-    const payload = JSON.parse(atob(response.credential.split('.')[1]));
-    const email = payload.email || '';
-    if (!email.endsWith('@' + ALLOWED_DOMAIN)) {
+  window.checkPw = function() {
+    const val = document.getElementById('pw-input').value;
+    if (val === PW) {
+      localStorage.setItem(KEY, PW);
+      document.getElementById('pw-step1').style.display = 'none';
+      document.getElementById('pw-step2').style.display = 'flex';
+      renderNameList();
+      setTimeout(() => document.getElementById('pw-name-input')?.focus(), 100);
+    } else {
       document.getElementById('pw-error').style.display = 'block';
-      google.accounts.id.disableAutoSelect();
-      return;
+      document.getElementById('pw-input').value = '';
+      document.getElementById('pw-input').focus();
     }
-    localStorage.setItem(KEY, 'google:' + email);
-    document.getElementById('pw-step1').style.display = 'none';
-    document.getElementById('pw-step2').style.display = 'flex';
-    renderNameList();
-    setTimeout(() => document.getElementById('pw-name-input')?.focus(), 100);
-  }
+  };
 
-  function initGoogleSignIn() {
-    google.accounts.id.initialize({
-      client_id: GOOGLE_CLIENT_ID,
-      callback: handleGoogleCredential,
-      auto_select: false,
-    });
-    google.accounts.id.renderButton(
-      document.getElementById('google-signin-btn'),
-      { theme: 'filled_blue', size: 'large', text: 'signin_with', locale: 'ja' }
-    );
-  }
-
-  const existingAuth = localStorage.getItem(KEY);
-  const isGoogleAuth = existingAuth && existingAuth.startsWith('google:');
-
-  if (isGoogleAuth) {
+  if (localStorage.getItem(KEY) === PW) {
     if (localStorage.getItem(NAME_KEY)) {
       gate.style.display = 'none';
     } else {
@@ -9360,22 +9348,8 @@ document.addEventListener('click', e => {
       renderNameList();
     }
   } else {
-    localStorage.removeItem(KEY);
     gate.style.display = 'flex';
     document.body.style.overflow = 'hidden';
-    // Wait for GSI to load
-    if (window.google && google.accounts) {
-      initGoogleSignIn();
-    } else {
-      window.addEventListener('load', () => {
-        const wait = setInterval(() => {
-          if (window.google && google.accounts) {
-            clearInterval(wait);
-            initGoogleSignIn();
-          }
-        }, 100);
-      });
-    }
   }
 })();
 </script>
