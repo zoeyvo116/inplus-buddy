@@ -2864,14 +2864,12 @@ function buildSetteiTmpl(d){
 
   // ── Released（未インストール） ──
   if(path==='not_installed'){
-    const apnLine = av && av!=='[APN]' ? `\n\n【Androidの場合のAPN設定】\nAPN名：${av}` : '';
     out +=
       `\nお客様のeSIM状況を確認いたしましたところ、eSIMがまだ端末にインストールされていない状態となっております。\n\n`+
       `まず以下の手順でeSIMをインストールいただく必要がございます。\n\n`+
       `【iPhoneの場合】\n設定 → モバイル通信 → 「＋」またはモバイル通信プランを追加 → QRコードを使用\n\n`+
-      `【Androidの場合】\n設定 → ネットワークとインターネット → SIM → SIMを追加 → QRコードをスキャン`+
-      `${apnLine}\n\n`+
-      `インストール完了後、渡航先にてeSIMを選択し、データローミングをONにしていただくとご利用いただけます。\n\n`+
+      `【Androidの場合】\n設定 → ネットワークとインターネット → SIM → SIMを追加 → QRコードをスキャン\n\n`+
+      `インストール完了後、渡航先でeSIMを選択し、データローミングをONにしていただくとご利用開始いただけます。\n\n`+
       `ご不明な点がございましたら、お気軽にご連絡ください😊`;
     out += footer();
     return out;
@@ -6890,8 +6888,21 @@ function buildTemplate() {
           body = body.replace(new RegExp(marker.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\s*'), marker + '\n＞' + d.quote + '\n→');
         }
       }
-      // Normalize: remove extra blank lines before ＞ and →
-      text = body.replace(/\n\n(＞)/g, '\n$1').replace(/\n\n(→)/g, '\n$1');
+      if (S.ch === 'LINE') {
+        // TMPL_DATA templates embed Amazon/generic headers & footers — strip them for LINE
+        // 1. Remove header up to "ご返答させて頂きたく思っております。"
+        body = body.replace(/^[\s\S]*?ご返答させて頂きたく思っております。\s*\n*/,'');
+        // 2. Remove quote indicator line (＞ or >) and response prefix (→)
+        body = body.replace(/^[＞>][^\n]*\n[→]?\s*/,'');
+        // 3. Remove company name from footer
+        body = body
+          .replace(/\n今後ともどうぞよろしくお願いいたします。\nイン・プラスサポートセンター$/,'')
+          .replace(/\n今後ともどうぞよろしくお願いいたします。$/,'');
+        text = base() + (body.trim() ? '\n\n' + body.trim() : '') + footer();
+      } else {
+        // Normalize: remove extra blank lines before ＞ and →
+        text = body.replace(/\n\n(＞)/g, '\n$1').replace(/\n\n(→)/g, '\n$1');
+      }
     }
   }
   if (!text) {
