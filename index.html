@@ -961,6 +961,15 @@ body{
             <div id="sw-path-badge"></div>
             <div id="sw-parsed-tags" class="sw-parsed" style="margin-top:6px"></div>
           </div>
+          <!-- LINE PATH A: 2-message toggle (shown only when LINE + PATH A) -->
+          <div id="line-path-a-toggle" style="display:none;margin-top:14px">
+            <label class="label" style="margin-bottom:6px">📨 LINEメッセージ（2通に分けて送信）</label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="chip active" id="pa-msg1-btn" onclick="pickPathAMsg(1,this)">1通目 — 状況確認＋Step①</button>
+              <button class="chip" id="pa-msg2-btn" onclick="pickPathAMsg(2,this)">2通目 — Step②③＋Screenshot</button>
+            </div>
+          </div>
+
           <div id="sw-topic-wrap" style="display:none;margin-top:14px">
             <label class="label" style="margin-bottom:6px">🎯 特に聞いてきた内容（選択でその部分を詳しく回答）</label>
             <div class="chips" id="sw-subq-chips" style="flex-wrap:wrap"></div>
@@ -2806,6 +2815,10 @@ function buildSetteiTmpl(d){
     return lines.join('\n');
   }
 
+  // Helper: apply device filter on every return path
+  const dev = p?.device || null;
+  function applyFilter(text){ return dev ? filterDeviceInstructions(text, dev) : text; }
+
   let out = nameP + base();
   if(swQuote && S.ch!=="LINE") out += `\n＞${swQuote}`;
 
@@ -2827,14 +2840,14 @@ function buildSetteiTmpl(d){
         `② データローミングをONにする\n\n`+
         `引き続きご不明な点がございましたら、\nお気軽にご連絡ください。`;
       out += footer();
-      return out;
+      return applyFilter(out);
     } else if(W.activAfterTsim){
       out +=
         `\n\nTsimにて確認いたしましたところ、以下の通りご案内いたします。\n\n`+
         `＜ご案内内容＞\n[※Tsimからの回答を元にここに記入してください]\n\n`+
         `引き続きご不明な点がございましたら、お気軽にご連絡ください。`;
       out += footer();
-      return out;
+      return applyFilter(out);
     } else {
       return '';
     }
@@ -2859,7 +2872,7 @@ function buildSetteiTmpl(d){
         `・SIM設定画面\n・データローミング設定画面\n・APN設定画面`;
     }
     out += footer();
-    return out;
+    return applyFilter(out);
   }
 
   // ── Released（未インストール） ──
@@ -2872,7 +2885,7 @@ function buildSetteiTmpl(d){
       `インストール完了後、渡航先でeSIMを選択し、データローミングをONにしていただくとご利用開始いただけます。\n\n`+
       `ご不明な点がございましたら、お気軽にご連絡ください😊`;
     out += footer();
-    return out;
+    return applyFilter(out);
   }
 
   const allItems = path==='A' ? SETTEI_A : SETTEI_B;
@@ -2897,7 +2910,7 @@ function buildSetteiTmpl(d){
     }else{
       out+=`\n\nすべての基本設定が完了していることを確認いたしました。\n引き続き現地にてご使用いただき、接続状況をご確認ください。`;
     }
-    out+=footer(); return out;
+    out+=footer(); return applyFilter(out);
   }
 
   // ── サブQ回答 ──
@@ -2922,6 +2935,31 @@ function buildSetteiTmpl(d){
     }
   } else {
     // ── フルチェックリスト ──
+    if(S.ch==='LINE' && path==='A'){
+      // LINE PATH A — 2-message split
+      const iv2 = p?.deviceIccid || iv;
+      const si = p?.systemIccid ? `\n　購入時：${p.systemIccid}` : '';
+      const di = p?.deviceIccid ? `\n　端末側：${p.deviceIccid}` : '';
+      if(_linePathAMsg===1){
+        out+=`\neSIM状況を確認しました。現在「無効化」の状態です。\nまず以下をお試しください。\n`+
+             SETTEI_A[0].detail(iv2,av);
+        out+=footer(); return applyFilter(out);
+      } else {
+        // Message 2: fresh, no confirmation block
+        return applyFilter(
+          `ご確認ありがとうございます。\n引き続き以下もお試しください。\n\n`+
+          `②ICCIDが一致しているか確認${si}${di}\n`+
+          `　【iPhone】設定→一般→情報→ICCID\n`+
+          `　【Android】設定→端末情報→SIM情報→ICCID\n\n`+
+          `③eSIMを有効化する\n`+
+          `　【iPhone】設定→モバイル通信→${iv2}→「このeSIMを使用する」→ON\n`+
+          `　【Android】設定→SIMカード→${iv2}→有効化\n\n`+
+          `まだ繋がらない場合は以下のスクリーンショットをお送りください。\n`+
+          `・SIM設定画面　・データローミング画面　・APN設定画面\n\n`+
+          `今後ともどうぞよろしくお願いいたします。`
+        );
+      }
+    }
     if(path==='A'){
       out+=`\n現在eSIMは「無効化」の状態となっております。\n以下の順番でご確認いただけますでしょうか。\n`;
     }else{
@@ -2932,9 +2970,7 @@ function buildSetteiTmpl(d){
   }
 
   out+=footer();
-  // Filter to device-specific instructions if device detected
-  if(S.parsedB2B?.device) out = filterDeviceInstructions(out, S.parsedB2B.device);
-  return out;
+  return applyFilter(out);
 }
 
 function buildQrTmpl(d){
@@ -4026,6 +4062,9 @@ function resetCase(){
   _linePrefixBItems = new Set();
   const lsp=document.getElementById('line-path-b-steps');
   if(lsp){lsp.style.display='none';lsp.innerHTML='';}
+  _linePathAMsg = 1;
+  const latog=document.getElementById('line-path-a-toggle');
+  if(latog) latog.style.display='none';
   // Hide preview pane
   const previewCol=document.getElementById('tmpl-preview-col');
   if(previewCol) previewCol.style.display='none';
@@ -4843,8 +4882,18 @@ function swProcessB2b(raw){
       if(p.path==='not_installed'){
         // eSIM not installed — skip sub-Q, template auto-generated
         swEl('sw-topic-wrap').style.display='none';
+        document.getElementById('line-path-a-toggle').style.display='none';
         showToast('📥 eSIM未インストール — インストール案内テンプレートを生成しました');
+      } else if(p.path==='A' && S.ch==='LINE'){
+        // PATH A on LINE: 2-message mode
+        swEl('sw-topic-wrap').style.display='none';
+        _linePathAMsg = 1;
+        document.getElementById('pa-msg1-btn')?.classList.add('active');
+        document.getElementById('pa-msg2-btn')?.classList.remove('active');
+        document.getElementById('line-path-a-toggle').style.display='block';
+        showToast('📨 PATH A — LINEは2通に分けて送信します');
       } else if(p.path){
+        document.getElementById('line-path-a-toggle').style.display='none';
         swEl('sw-topic-wrap').style.display='block';swRenderSubQChips(p.path);
       }
       if(S.ch==='LINE'){
@@ -6931,6 +6980,16 @@ function autoCalcDeliveryTime(){
   } else {
     el.value='翌営業日11:00前後';
   }
+}
+
+// ===== LINE PATH-A 2-MESSAGE MODE =====
+let _linePathAMsg = 1; // 1 = first message, 2 = follow-up
+
+function pickPathAMsg(n, btn){
+  _linePathAMsg = n;
+  document.getElementById('pa-msg1-btn')?.classList.toggle('active', n===1);
+  document.getElementById('pa-msg2-btn')?.classList.toggle('active', n===2);
+  updatePreview();
 }
 
 // ===== LINE PATH-B STEP-BY-STEP =====
