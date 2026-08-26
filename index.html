@@ -4295,6 +4295,7 @@ const CASES={
     {id:'add_data',label:'データ追加購入'},
     {id:'device_check',label:'端末対応確認'},
     {id:'qr_read_method',label:'QRコードの読み取り方'},
+    {id:'china_google',label:'中国プラン - Google使用可否'},
   ],
   '定型文':[
     {id:'teikeibun_open_line',label:'挨拶・開始'},
@@ -8470,7 +8471,9 @@ const HO = {
 
   startAutoCheck() {
     if (this._checkInterval) return;
-    this._checkInterval = setInterval(() => this.checkBanner(), 60 * 1000); // 1 minute
+    this._checkInterval = setInterval(() => {
+      if (document.visibilityState === 'visible') this.checkBanner();
+    }, 2 * 60 * 1000);
   },
 
   async confirmRead() {
